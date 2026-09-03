@@ -1,5 +1,5 @@
 // Thay đổi version này mỗi khi bạn đẩy code mới lên Github (VD: 'donkinh-v2', 'donkinh-v3')
-const CACHE_NAME = 'donkinh-v1.7';
+const CACHE_NAME = 'donkinh-v1';
 
 // Danh sách các file cần lưu Cache để chạy offline và tải nhanh
 const urlsToCache = [
@@ -13,7 +13,10 @@ const urlsToCache = [
     '/js/utils.js',
     '/js/database.js',
     '/js/templates.js',
-    '/chukyso.jpg' // Nhớ thêm các hình ảnh hoặc icon bạn đang dùng
+    '/chukyso.jpg',
+    '/manifest.json',
+    '/icon-192x192.png',
+    '/icon-512x512.png'
 ];
 
 // 1. SỰ KIỆN CÀI ĐẶT (INSTALL)

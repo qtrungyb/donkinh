@@ -1,0 +1,21 @@
+"name": "Hệ Thống Quản Lý Đơn Kính",
+  "short_name": "Đơn Kính",
+  "description": "Ứng dụng quản lý và in đơn kính điện tử",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
