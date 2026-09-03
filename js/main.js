@@ -96,7 +96,11 @@ const DOM = {
         btnEdit: document.getElementById('modalBtnEdit'),
         btnExport: document.getElementById('modalBtnExport'),
         btnExportImg: document.getElementById('modalBtnExportImg'),
-        btnPrint: document.getElementById('modalBtnPrint')
+        btnPrint: document.getElementById('modalBtnPrint'),
+        // THÊM 3 DÒNG NÀY:
+        qrCode: document.getElementById('modalQrCode'),
+        btnPreviewMobile: document.getElementById('modalBtnPreviewMobile'),
+        btnClosePreviewMobile: document.getElementById('btnClosePreviewMobile')
     }
 };
 
@@ -259,6 +263,20 @@ function setupUIEventListeners() {
     
     DOM.modal.btnExportImg.addEventListener('click', exportImageFromModal);
     DOM.modal.close.addEventListener('click', closeModal);
+    
+    // BẮT ĐẦU THÊM MỚI: Bật/Tắt Bản xem trước Fullscreen trên điện thoại
+    if(DOM.modal.btnPreviewMobile) {
+        DOM.modal.btnPreviewMobile.addEventListener('click', () => {
+            document.querySelector('.modal-container').classList.add('show-preview');
+        });
+    }
+    if(DOM.modal.btnClosePreviewMobile) {
+        DOM.modal.btnClosePreviewMobile.addEventListener('click', () => {
+            document.querySelector('.modal-container').classList.remove('show-preview');
+        });
+    }
+    // KẾT THÚC THÊM MỚI
+    
     DOM.modal.btnEdit.addEventListener('click', () => {
         const index = DOM.modal.overlay.dataset.currentIndex;
         if(index !== undefined) startEditing(index);
@@ -1025,7 +1043,41 @@ function renderPatientHistory(hoTen, sdt) {
 // ============================================================================
 function openDetailModal(index) {
     const item = AppState.currentSearchResults[index]; const data = item.jsonData;
-    
+    // 1. Reset trạng thái (Giấu bản xem trước nếu đang bật ở lần mở trước)
+    document.querySelector('.modal-container').classList.remove('show-preview');
+
+    // 2. Thuật toán sinh mã QR Code
+    if (DOM.modal.qrCode && typeof QRious !== 'undefined') {
+        const fNgay = String(data.ngay || '').padStart(2, '0'); 
+        const fThang = String(data.thang || '').padStart(2, '0'); 
+        const fNam = data.nam || '';
+        
+        const buildEyeStr = (cauId, truId, trucId) => {
+            const cau = String(data[cauId] || "").trim();
+            const tru = String(data[truId] || "").trim();
+            const truc = String(data[trucId] || "").trim().replace(/°/g, ""); 
+            if (!cau && !tru) return "0.00"; 
+            let str = cau || "+0.00";
+            if (tru && tru !== "0.00" && tru !== "0" && tru !== "+0.00" && tru !== "-0.00") str += `/${tru}` + (truc ? `x${truc}` : ``);
+            return str;
+        };
+
+        const dataObj = {
+            ten: String(item.hoTen || "Khách Hàng").trim(),
+            tuoi: String(data.tuoi || "--").trim(), sdt: String(item.sdt || "---").trim(),
+            mp: buildEyeStr('mp_cau', 'mp_tru', 'mp_truc'), mt: buildEyeStr('mt_cau', 'mt_tru', 'mt_truc'),
+            pd: String(data.kcDongTu_1 || data.kcDongTu || "---").trim().replace('mm', ''),
+            ngay: `${fNgay}/${fThang}/${fNam}`, cd: String(data.chanDoan || "").trim(), gc: String(data.ghiChu || "").trim(),
+            tlkk_mp: String(data.tlkk_mp || "---").trim(), tlkk_mt: String(data.tlkk_mt || "---").trim(),
+            tl_mp: String(data.mp_gc || "---").trim(), tl_mt: String(data.mt_gc || "---").trim()
+        };
+        
+        // Mã hóa dữ liệu và truyền vào thẻ Canvas bằng thư viện QRious
+        const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(dataObj)))));
+        const safeQrData = `https://donkinh-eea6b.web.app/don-kinh.html?data=${encodedData}`;
+        
+        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 250, level: "M" });
+    }
     DOM.modal.iframe.srcdoc = generatePrintHtml(data);
     DOM.modal.name.innerText = item.hoTen;
     DOM.modal.tuoi.innerText = data.tuoi || '--';
