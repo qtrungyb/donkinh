@@ -35,7 +35,21 @@
     --danger-color: #ff453a;
 }
 
-* { box-sizing: border-box; }
+/* ==========================================
+   TỐI ƯU UX NATIVE APP (CHỐNG BÔI ĐEN, CHỚP XÁM, NẢY TRANG) 
+   ========================================== */
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; /* Triệt tiêu vệt xám chớp nháy khi chạm nút */
+    -webkit-user-select: none; /* Chống bôi đen văn bản lung tung trên iOS/Safari */
+    user-select: none; /* Chống bôi đen trên Android/Chrome */
+}
+
+/* CỰC KỲ QUAN TRỌNG: Mở khóa bôi đen và con trỏ cho các ô nhập liệu, nếu không sẽ không gõ được chữ */
+input, select, textarea {
+    -webkit-user-select: auto !important;
+    user-select: auto !important;
+}
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -46,6 +60,9 @@ body {
     line-height: 1.5; 
     letter-spacing: -0.01em;
     transition: background-color 0.15s ease, color 0.15s ease;
+    
+    -webkit-touch-callout: none; /* Ngăn menu "Sao chép/Dán" bật lên khi ấn giữ lâu trên màn hình */
+    overscroll-behavior-y: none; /* Khóa trục Y, chống hiệu ứng nảy cao su và kéo-để-làm-mới (Pull-to-refresh) */
 }
 
 /* --- SCROLLBAR CHUẨN --- */
