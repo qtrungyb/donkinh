@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self'; 
+        script-src 'self' 'unsafe-inline' https://www.gstatic.com https://*.firebasedatabase.app https://cdnjs.cloudflare.com; 
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+        font-src 'self' https://fonts.gstatic.com; 
+        connect-src 'self' 
+            https://*.firebasedatabase.app 
+            wss://*.firebasedatabase.app 
+            https://securetoken.googleapis.com 
+            https://identitytoolkit.googleapis.com; 
+        frame-src 'self' blob: data: https://*.firebasedatabase.app; 
+        img-src 'self' data: blob:;
+    ">
+    <title>ĐƠN KÍNH</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 15h2' stroke='%23005cbf' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M20 15h2' stroke='%23005cbf' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='14' y1='15' x2='10' y2='15' stroke='%23005cbf' stroke-width='2.5' stroke-linecap='round'/%3E%3Cpath d='M5.5 11.5L7 6h10l1.5 5.5' stroke='%23005cbf' stroke-width='2.5' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='6' cy='15' r='4' fill='%23e0f7fa' stroke='%23007bff' stroke-width='2.5'/%3E%3Ccircle cx='18' cy='15' r='4' fill='%23e0f7fa' stroke='%23007bff' stroke-width='2.5'/%3E%3C/svg%3E">
+    
+    <!-- Thư viện HTML2Canvas dùng để xuất ảnh -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- NHÚNG FILE CSS -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<!-- CHỨA TOAST THÔNG BÁO -->
+<div id="toastContainer"></div>
+
+<!-- MÀN HÌNH ĐĂNG NHẬP -->
+<div id="loginScreen" style="display: none;">
+    <div class="login-wrapper">
+        <div class="login-branding">
+            <div class="brand-subtitle">Hệ Thống Quản Lý</div>
+            <div class="brand-title">Đơn Kính</div>
+        </div>
+        
+        <div class="login-box">
+            <form id="loginForm">
+                <div class="input-group-login">
+                    <input type="text" id="loginEmail" placeholder=" " required autocomplete="username">
+                    <label for="loginEmail">Tên đăng nhập</label>
+                </div>
+                
+                <div class="input-group-login">
+                    <input type="password" id="loginPassword" placeholder=" " required autocomplete="current-password">
+                    <label for="loginPassword">Mật khẩu</label>
+                </div>
+                
+                <label class="custom-checkbox-wrapper">
+                    <input type="checkbox" id="rememberMe">
+                    <span class="custom-checkbox"></span>
+                    <span class="checkbox-text">Ghi nhớ phiên đăng nhập</span>
+                </label>
+                
+                <button type="submit" id="btnLoginSubmit" class="btn btn-blue login-btn">TRUY CẬP HỆ THỐNG</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ỨNG DỤNG CHÍNH -->
+<div id="mainApp" style="display: none;">
+    
+    <!-- THANH ĐIỀU HƯỚNG TRÊN (TOP NAV) -->
+    <div class="top-nav">
+        <div class="nav-user-dropdown">
+            <div class="user-trigger">
+                <div id="userAvatar" class="user-avatar">?</div>
+                <div class="user-info-text">
+                    <span id="userEmailDisplay" class="user-name-display">ĐANG TẢI...</span>
+                    <span id="userRoleDisplay" class="user-role-badge">Hệ thống</span>
+                </div>
+            </div>
+    
+            <div class="dropdown-menu">
+                <button class="menu-item" id="btnOpenChangePass">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>Đổi mật khẩu</span>
+                </button>
+        
+                <button class="menu-item item-danger" id="btnLogout">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
+        </div>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle">GIAO DIỆN TỐI</button>
+        </div>
+    </div>
+
+    <!-- KHUNG CHỨA NỘI DUNG -->
+    <div class="main-wrapper">
+         
+         <!-- GIAO DIỆN 1: TỔNG QUAN (DASHBOARD) -->
+         <div id="dashboardView">
+            <div class="dashboard-header">
+                <h2 style="margin:0;">ĐƠN KÍNH</h2>
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <button id="btnDashboardDraft" class="btn btn-dark" style="display: none; padding: 12px 24px; margin: 0;">
+                        <span class="text-default">ĐƠN NHÁP</span>
+                        <span class="text-hover">TIẾP TỤC TẠO ĐƠN</span>
+                    </button>
+                    <button id="btnCreateNew" class="btn btn-blue" style="padding: 12px 24px; margin: 0;">TẠO ĐƠN MỚI</button>
+                </div>
+            </div>
+            
+            <div class="search-module" style="margin-bottom: 36px;">
+                <div class="search-box" id="searchBoxContainer">
+                    <div class="search-wrapper">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        
+                        <input type="text" id="dashboardSearchInput" placeholder="Nhập tên hoặc số điện thoại..." autocomplete="off">
+                        
+                        <span id="dashSearchClear" class="search-clear-btn" title="Xóa tìm kiếm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </span>
+                    </div>
+                    <button class="btn btn-search" id="btnSearchSubmit">TÌM KIẾM</button>
+                </div>
+            </div>
+
+            <div id="dashboardList" class="dashboard-grid"></div>
+            <button id="dashLoadMoreBtn" class="btn-dashed" style="display: none;">HIỂN THỊ THÊM</button>
+        </div>
+
+        <!-- GIAO DIỆN 2: FORM NHẬP LIỆU -->
+        <div id="formView" class="container" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <button class="btn btn-gray navBackToDashBtn" style="margin: 0;">QUAY LẠI DANH SÁCH ĐƠN KÍNH</button>
+                <button id="btnDeleteDraft" class="btn btn-danger" style="display: none; margin: 0;">XÓA ĐƠN NHÁP</button>
+            </div>
+            <h2 class="main-title">
+                <span id="formTitle">Tạo Đơn Kính Mới</span>
+            </h2>
+            <!-- STICKY HEADER: Bám đỉnh khi cuộn form -->
+            <div id="stickyPatientHeader" class="sticky-patient-header">
+                <div class="sticky-patient-info">
+                    ĐANG KÊ ĐƠN: <span id="stickyName">---</span>
+                </div>
+                <div class="sticky-patient-meta">
+                    Tuổi: <span id="stickyAge">--</span>
+                </div>
+            </div>
+            <form id="donKinhForm">
+                <!-- KHỐI 1: THÔNG TIN BỆNH NHÂN -->
+                <div class="section-group">
+                    <div class="section-title">Thông tin</div>
+                    <div class="grid-row grid-patient-info">
+                        <div><label>Họ và tên <span class="req-star">*</span></label><div class="autocomplete-wrapper input-clear-wrapper"><input type="text" id="hoTen" required autocomplete="off"><span class="clear-btn" data-target="hoTen">&times;</span><div id="hoTenDropdown" class="autocomplete-dropdown"></div></div></div>
+                        <div><label>Tuổi <span class="req-star">*</span></label><div class="input-clear-wrapper"><input type="text" id="tuoi" class="number-input" data-maxlength="4"><span class="clear-btn" data-target="tuoi">&times;</span></div></div>
+                        <div><label>Giới tính</label><select id="gioi"><option value="Nam" selected>Nam</option><option value="Nữ">Nữ</option></select></div>
+                        <div><label>Địa chỉ <span class="req-star">*</span></label><div class="autocomplete-wrapper input-clear-wrapper"><input type="text" id="diaChi" autocomplete="off"><span class="clear-btn" data-target="diaChi">&times;</span><div id="diaChiDropdown" class="autocomplete-dropdown"></div></div></div>
+                        <div><label>Số điện thoại</label><div class="input-clear-wrapper"><input type="text" id="sdt" class="number-input" data-maxlength="10" autocomplete="off"><span class="clear-btn" data-target="sdt">&times;</span></div></div>
+                    </div>
+					<div id="patientHistoryContainer" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 1px dashed var(--border-light);">
+						<div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; letter-spacing: 0.05em;">LỊCH SỬ KHÁM (CÁC ĐƠN KÍNH TRƯỚC ĐÂY)</div>
+						<div id="patientHistoryList" style="display: flex; gap: 16px; overflow-x: auto; padding-bottom: 8px;"></div>
+					</div>
+                </div>
+
+                <!-- KHỐI 2: CHẨN ĐOÁN -->
+                <div class="section-group">
+                    <div class="section-title">Chẩn đoán</div>
+                    <div class="diag-table">
+                        <div class="diag-row row-2m"><div class="diag-label-eye">2M</div><div class="diag-button-group"><label class="diag-opt"><input type="checkbox" id="diag_2m_can" class="diag-cb" data-eye="diag_2m" data-type="can"> Cận</label><label class="diag-opt"><input type="checkbox" id="diag_2m_vien" class="diag-cb" data-eye="diag_2m" data-type="vien"> Viễn</label><label class="diag-opt"><input type="checkbox" id="diag_2m_loan" class="diag-cb" data-eye="diag_2m" data-type="loan"> Loạn</label></div></div>
+                        <div class="diag-row row-mp"><div class="diag-label-eye">MP</div><div class="diag-button-group"><label class="diag-opt"><input type="checkbox" id="diag_mp_can" class="diag-cb" data-eye="diag_mp" data-type="can"> Cận</label><label class="diag-opt"><input type="checkbox" id="diag_mp_vien" class="diag-cb" data-eye="diag_mp" data-type="vien"> Viễn</label><label class="diag-opt"><input type="checkbox" id="diag_mp_loan" class="diag-cb" data-eye="diag_mp" data-type="loan"> Loạn</label></div></div>
+                        <div class="diag-row row-mt"><div class="diag-label-eye">MT</div><div class="diag-button-group"><label class="diag-opt"><input type="checkbox" id="diag_mt_can" class="diag-cb" data-eye="diag_mt" data-type="can"> Cận</label><label class="diag-opt"><input type="checkbox" id="diag_mt_vien" class="diag-cb" data-eye="diag_mt" data-type="vien"> Viễn</label><label class="diag-opt"><input type="checkbox" id="diag_mt_loan" class="diag-cb" data-eye="diag_mt" data-type="loan"> Loạn</label></div></div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" id="chanDoan" style="flex-grow: 1; font-weight: 600; color: var(--accent-color);" placeholder="Kết quả chẩn đoán tự động...">
+                        <button type="button" class="btn btn-gray" id="btnClearDiag">Làm mới</button>
+                    </div>
+                </div>
+
+                <!-- KHỐI 3: KHÁM THỊ LỰC -->
+                <div class="section-group">
+                    <div class="section-title">Khám Thị Lực</div>
+                    <div class="vision-container">
+                        <div class="vision-block"><span class="vision-label">Không kính</span><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">MP</span><input type="text" id="tlkk_mp" autocomplete="off"></div><div id="tlkk_mp_Dropdown" class="autocomplete-dropdown"></div></div><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">MT</span><input type="text" id="tlkk_mt" autocomplete="off"></div><div id="tlkk_mt_Dropdown" class="autocomplete-dropdown"></div></div></div>
+                        <div class="vision-block"><span class="vision-label">Kính lỗ</span><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">MP</span><input type="text" id="tlkl_mp" autocomplete="off"></div><div id="tlkl_mp_Dropdown" class="autocomplete-dropdown"></div></div><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">MT</span><input type="text" id="tlkl_mt" autocomplete="off"></div><div id="tlkl_mt_Dropdown" class="autocomplete-dropdown"></div></div></div>
+                        <div class="vision-block"><span class="vision-label">Kính cũ</span><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">MP</span><input type="text" id="tlkc_mp" autocomplete="off"></div><div id="tlkc_mp_Dropdown" class="autocomplete-dropdown"></div></div><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">MT</span><input type="text" id="tlkc_mt" autocomplete="off"></div><div id="tlkc_mt_Dropdown" class="autocomplete-dropdown"></div></div></div>
+                        <div class="vision-block ng"><span class="vision-label">Nhìn gần</span><div class="autocomplete-wrapper"><div class="input-group"><span class="prefix">N</span><input type="text" id="tlng" placeholder="..." autocomplete="off"><span class="prefix" style="border-left: 1px solid var(--border-color); border-right: none; width: 60px;">@35cm</span></div><div id="tlng_Dropdown" class="autocomplete-dropdown"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- KHỐI 4: THÔNG SỐ ĐƠN KÍNH -->
+                <div class="section-group">
+                    <div class="section-title" style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span>Thông số Đơn kính</span>
+                        <button type="button" id="btnAddKinh2" style="background: transparent; border: 1px solid var(--border-color); font-size: 10px; font-weight: 700; padding: 4px 8px; cursor: pointer; color: var(--text-main); border-radius: var(--radius); text-transform: uppercase;">+ THÊM BẢNG ĐƠN KÍNH 2</button>
+                    </div>
+
+                    <div id="blockKinh1">
+                        <div class="grid-row grid-col-kinh">
+                            <div><div class="segmented-control"><input type="radio" id="md_xa" name="donKinh_1" value="Nhìn xa" checked><label for="md_xa">Nhìn xa</label><input type="radio" id="md_gan" name="donKinh_1" value="Nhìn gần"><label for="md_gan">Nhìn gần</label></div></div>
+                            <div><div class="segmented-control"><input type="radio" id="lk_1" name="loaiKinh_1" value="Một tròng" checked><label for="lk_1">Một tròng</label><input type="radio" id="lk_2" name="loaiKinh_1" value="Hai tròng"><label for="lk_2">Hai tròng</label><input type="radio" id="lk_3" name="loaiKinh_1" value="Đa tròng"><label for="lk_3">Đa tròng</label></div></div>
+                        </div>
+                        
+                        <div class="table-responsive-wrapper">
+                            <table class="ui-table">
+                                <thead><tr><th style="width: 12%;">Mắt</th><th style="width: 22%;">Độ cầu (Sph) <span class="req-star">*</span></th><th style="width: 22%;">Độ trụ (Cyl)</th><th style="width: 22%;">Trục (Axis)</th><th style="width: 22%;">Thị lực</th></tr></thead>
+                                <tbody>
+                                    <tr><td style="text-align: center;"><span class="eye-badge badge-mp">MP</span></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_cau" class="table-input diopter-input" autocomplete="off"><div id="mp_cau_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_tru" class="table-input diopter-input" autocomplete="off"><div id="mp_tru_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_truc" class="table-input" autocomplete="off"><div id="mp_truc_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_gc" class="table-input" autocomplete="off"><div id="mp_gc_Dropdown" class="autocomplete-dropdown"></div></div></td></tr>
+                                    <tr><td style="text-align: center;"><span class="eye-badge badge-mt">MT</span></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_cau" class="table-input diopter-input" autocomplete="off"><div id="mt_cau_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_tru" class="table-input diopter-input" autocomplete="off"><div id="mt_tru_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_truc" class="table-input" autocomplete="off"><div id="mt_truc_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_gc" class="table-input" autocomplete="off"><div id="mt_gc_Dropdown" class="autocomplete-dropdown"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: -24px; margin-bottom: 32px;">
+                            <div style="width: 160px;"> <div class="input-group pd-group" style="display: flex; align-items: center;">
+                                    <span class="prefix" style="color: var(--text-main); padding-right: 8px; font-size: 13px;">PD <span style="color: var(--danger-color); margin-left: 2px;">*</span></span>
+                                    <input type="text" id="kcDongTu_1" placeholder="---" autocomplete="off" style="text-align: center; flex: 1;" class="number-input" data-maxlength="2">
+                                    <span class="prefix" style="border-left: 1px solid var(--border-color); border-right: none; padding-left: 12px; font-weight: 900; color: var(--text-main); font-size: 14px;">mm</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    <!-- BẢNG ĐƠN KÍNH 2 TÙY CHỌN -->
+                    <div id="blockKinh2" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; font-size: 13px; margin-bottom: 15px;">
+                            <span>THÔNG SỐ ĐƠN KÍNH 2</span>
+                            <span class="remove-block-btn" id="btnRemoveKinh2">Xoá bảng này</span>
+                        </div>
+                        <div class="grid-row grid-col-kinh">
+                            <div><div class="segmented-control"><input type="radio" id="md_xa_2" name="donKinh_2" value="Nhìn xa"><label for="md_xa_2">Nhìn xa</label><input type="radio" id="md_gan_2" name="donKinh_2" value="Nhìn gần" checked><label for="md_gan_2">Nhìn gần</label></div></div>
+                            <div><div class="segmented-control"><input type="radio" id="lk_1_2" name="loaiKinh_2" value="Một tròng" checked><label for="lk_1_2">Một tròng</label><input type="radio" id="lk_2_2" name="loaiKinh_2" value="Hai tròng"><label for="lk_2_2">Hai tròng</label><input type="radio" id="lk_3_2" name="loaiKinh_2" value="Đa tròng"><label for="lk_3_2">Đa tròng</label></div></div>
+                        </div>
+                        
+                        <div class="table-responsive-wrapper">
+                            <table class="ui-table">
+                                <thead><tr><th style="width: 12%;">Mắt</th><th style="width: 22%;">Độ cầu (Sph) <span class="req-star">*</span></th><th style="width: 22%;">Độ trụ (Cyl)</th><th style="width: 22%;">Trục (Axis)</th><th style="width: 22%;">Thị lực</th></tr></thead>
+                                <tbody>
+                                    <tr><td style="text-align: center;"><span class="eye-badge badge-mp">MP</span></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_cau_2" class="table-input diopter-input" autocomplete="off"><div id="mp_cau_2_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_tru_2" class="table-input diopter-input" autocomplete="off"><div id="mp_tru_2_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_truc_2" class="table-input" autocomplete="off"><div id="mp_truc_2_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mp_gc_2" class="table-input" autocomplete="off"><div id="mp_gc_2_Dropdown" class="autocomplete-dropdown"></div></div></td></tr>
+                                    <tr><td style="text-align: center;"><span class="eye-badge badge-mt">MT</span></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_cau_2" class="table-input diopter-input" autocomplete="off"><div id="mt_cau_2_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_tru_2" class="table-input diopter-input" autocomplete="off"><div id="mt_tru_2_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_truc_2" class="table-input" autocomplete="off"><div id="mt_truc_2_Dropdown" class="autocomplete-dropdown"></div></div></td><td><div class="autocomplete-wrapper"><input type="text" id="mt_gc_2" class="table-input" autocomplete="off"><div id="mt_gc_2_Dropdown" class="autocomplete-dropdown"></div></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: -24px; margin-bottom: 16px;">
+                            <div style="width: 140px;">
+                                <div class="input-group pd-group">
+                                    <input type="text" id="kcDongTu_2" placeholder="---" autocomplete="off" style="text-align: center; flex: 1;" class="number-input" data-maxlength="2">
+                                    <span class="prefix" style="border-left: 1px solid var(--border-color); border-right: none; padding-left: 12px;">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <label>Ghi chú & Lịch hẹn</label>
+                        <div class="input-clear-wrapper">
+                            <input type="text" id="ghiChu" placeholder="Nhập lưu ý thêm hoặc chọn lịch tái khám bên dưới..." autocomplete="off">
+                            <span class="clear-btn" data-target="ghiChu">&times;</span>
+                        </div>
+                        
+                        <!-- Dải Smart Chips Tái Khám -->
+                        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;" id="followUpChips">
+                            <button type="button" class="btn-chip" data-days="7">+1 Tuần</button>
+                            <button type="button" class="btn-chip" data-months="1">+1 Tháng</button>
+                            <button type="button" class="btn-chip" data-months="3">+3 Tháng</button>
+                            <button type="button" class="btn-chip" data-months="6">+6 Tháng</button>
+                        </div>
+                    </div>
+
+                <div class="date-signature">
+                    <div class="signature-box">
+                        <div class="date-selectors">
+                            <input type="date" id="ngayKham" style="width: 100%; text-align: center; font-weight: 600; padding: 4px; cursor: pointer;">
+                        </div>
+                        <div style="font-weight: 600; font-size: 14px; margin-top: 4px; margin-bottom: 5px;">Người khám</div>
+                        <img src="chukyso.jpg" alt="Chữ ký" style="height: 60px; object-fit: contain; margin-bottom: 5px; pointer-events: none;">
+                        <input type="text" id="bsKham" placeholder="Nhập tên bác sĩ..." value="BSCKI. Chu Kiều Giang" style="text-align: center; font-weight: 800; font-size: 16px; border: none; outline: none; background: transparent; width: 100%;">
+                    </div>
+                </div>
+            </form>
+
+            <div class="actions">
+                <button type="button" class="btn btn-green" id="btnSaveSheet" style="padding: 12px 24px; font-size: 14px;">LƯU ĐƠN KÍNH</button>
+                <button type="button" class="btn btn-gray" id="btnCancelEdit" style="display: none; padding: 12px 24px; font-size: 14px;">HỦY SỬA</button>
+                
+                <button type="button" class="btn btn-gray navBackToDashBtn" id="btnBackToDashBottom" style="display: none; padding: 12px 24px; font-size: 14px;">QUAY LẠI</button>
+                <button type="button" class="btn btn-blue" id="btnEditAfterSave" style="display: none; padding: 12px 24px; font-size: 14px;">SỬA ĐƠN</button>
+                <button type="button" class="btn btn-dark" id="btnExport" style="display: none; padding: 12px 24px; font-size: 14px;">XUẤT WORD</button>
+                <button type="button" class="btn btn-dark" id="btnExportImg" style="display: none; padding: 12px 24px; font-size: 14px;">XUẤT ẢNH</button>
+                <button type="button" class="btn btn-blue" id="btnPrint" style="display: none; padding: 12px 24px; font-size: 14px;">IN ĐƠN</button>
+                <button type="button" class="btn btn-danger" id="btnDeleteAfterSave" style="display: none; padding: 12px 24px; font-size: 14px;">XÓA ĐƠN</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL XEM CHI TIẾT BỆNH NHÂN -->
+<div id="detailModal" class="modal-overlay">
+    <div class="modal-container">
+        
+        <div class="modal-sidebar">
+            <div class="sidebar-top-block" style="width: 100%;">
+                <div class="sidebar-top" style="margin-bottom: 28px;">
+                    <span class="close-modal" id="btnCloseModal">← QUAY LẠI</span>
+                </div>
+                
+                <h1 id="modalPatientName" class="massive-name">---</h1>
+                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.02em; text-transform: uppercase;">
+                    <span id="modalPatientTuoi">--</span> tuổi | <span id="modalPatientGioi">--</span> | <span id="modalPatientSdt">--</span>
+                </div>
+                
+                <div class="modal-actions-horizontal">
+                    <button class="btn btn-blue" id="modalBtnEdit">SỬA ĐƠN</button>
+                    <button class="btn btn-dark" id="modalBtnExport">XUẤT WORD</button>
+                    <button class="btn btn-dark" id="modalBtnExportImg">XUẤT ẢNH</button>
+                    <button class="btn btn-green" id="modalBtnPrint">IN ĐƠN KÍNH</button>
+                </div>
+            </div>
+
+            <div class="sidebar-bottom-block" style="margin-top: auto; width: 100%;">
+                <div class="meta-separator" style="margin: 0 0 20px 0; width: 100%;"></div>
+                <div class="meta-label" style="margin-bottom: 4px;">Chẩn đoán</div>
+                <div id="modalPatientDiag" class="patient-diag-text" style="font-size: 15px; margin-bottom: 12px; line-height: 1.4;">---</div>
+                
+                <div id="modalTypographicGrid"></div>
+            </div>
+        </div>
+
+        <div class="modal-preview-workspace">
+            <div class="preview-canvas-wrapper">
+                <iframe id="modalIframe"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ĐỔI MẬT KHẨU -->
+<div id="changePasswordModal" class="modal-overlay" style="align-items: center; justify-content: center; z-index: 2500;">
+    <div class="login-box" style="margin: auto;">
+        <h2>ĐỔI MẬT KHẨU</h2>
+        <form id="changePasswordForm">
+            <input type="password" id="oldPassword" placeholder="Mật khẩu cũ" required>
+            <input type="password" id="newPassword" placeholder="Mật khẩu mới (ít nhất 6 ký tự)" required minlength="6">
+            <input type="password" id="confirmNewPassword" placeholder="Nhập lại mật khẩu mới" required minlength="6">
+            <div style="display: flex; gap: 16px; margin-top: 24px;">
+                <button type="button" class="btn btn-gray" style="flex: 1;" id="btnCloseChangePass">HỦY</button>
+                <button type="submit" class="btn btn-blue" style="flex: 1;">XÁC NHẬN</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- NHÚNG FILE JS CHÍNH CỦA ỨNG DỤNG -->
+<script type="module" src="./js/main.js"></script>
+
+</body>
+</html>

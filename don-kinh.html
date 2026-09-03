@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn Kính Điện Tử</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: #f1f5f9; background-image: linear-gradient(135deg, #e0f2fe 0%, #f1f5f9 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; padding: 20px; color: #0f172a; transition: all 0.5s ease; overflow-x: hidden; }
+        
+        body.expired { background-image: linear-gradient(135deg, #fef2f2 0%, #f1f5f9 100%); }
+        body.expired .card-header { background: #ef4444 !important; }
+        body.expired .value.name { color: #ef4444 !important; }
+        body.expired .eye-badge { background: #ef4444 !important; }
+        body.expired .eye-row { background: #fef2f2 !important; }
+        body.expired .eye-metrics .label { color: #ef4444 !important; }
+        body.expired .pd-box .value { color: #ef4444 !important; }
+        body.expired .vision-stats-inline b.after { color: #ef4444 !important; }
+        body.expired .vision-stats-inline { border-top-color: #fca5a5 !important; }
+        body.expired .ai-box { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important; border-color: #fca5a5 !important; }
+        body.expired .ai-title { color: #991b1b !important; }
+        body.expired .ai-content { color: #b91c1c !important; }
+
+        /* HỆ THỐNG LẬT THẺ 3D */
+        .flip-container { perspective: 1500px; width: 100%; max-width: 420px; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .flipper { display: grid; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; width: 100%; }
+        .flipped .flipper { transform: rotateY(180deg); }
+        
+        .glass-card { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; background: #ffffff; border-radius: 24px; box-shadow: 0 20px 40px -10px rgba(2, 132, 199, 0.15); display: flex; flex-direction: column; overflow: hidden; }
+        .back { transform: rotateY(180deg); }
+        
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .card-header { background: #0284c7; color: #ffffff; padding: 25px 24px; text-align: center; position: relative; transition: background 0.5s ease; }
+        .card-header::after { content: ''; position: absolute; bottom: -15px; left: 0; width: 100%; height: 30px; background: #ffffff; border-radius: 50% 50% 0 0; }
+        .card-title { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; margin: 0; text-align: center; color: #ffffff;}
+        .card-subtitle { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; margin-top: 4px; }
+        
+        .card-body { padding: 20px 24px 24px 24px; flex-grow: 1; display: flex; flex-direction: column; }
+        
+        .warning-box { background: #fef2f2; color: #991b1b; padding: 14px; border-radius: 12px; border: 1px dashed #f87171; margin-bottom: 20px; font-size: 13px; font-weight: 600; text-align: center; line-height: 1.5; display: none; }
+        
+        .patient-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #cbd5e1; }
+        .info-group { display: flex; flex-direction: column; gap: 4px; }
+        .info-group.full-width { grid-column: 1 / -1; }
+        .label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;}
+        .value { font-size: 16px; font-weight: 700; color: #0f172a; }
+        .value.name { font-size: 20px; font-weight: 900; color: #0284c7; text-transform: uppercase; }
+        
+        .info-row-full { background: #f8fafc; padding: 14px 16px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; display: none; }
+        .info-row-full.note { background: #fffbeb; border-color: #fde68a; margin-top: 0; margin-bottom: 20px; }
+        
+        .eye-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .eye-row { background: #e0f2fe; border-radius: 12px; padding: 16px; display: flex; align-items: flex-start; gap: 16px; transition: background 0.5s ease; }
+        .eye-badge { background: #0284c7; color: #ffffff; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: background 0.5s ease; }
+        
+        .eye-metrics { display: flex; flex-direction: column; width: 100%; }
+        .eye-metrics .label { color: #0284c7; margin-bottom: 2px; transition: color 0.5s ease; }
+        .eye-metrics .value { font-family: "Courier New", Courier, monospace; font-size: 16px; font-weight: 800; letter-spacing: -0.5px; color: #0f172a; }
+        
+        /* THỊ LỰC NẰM GỌN TRONG TỪNG MẮT Ở MẶT TRƯỚC */
+        .vision-stats-inline { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; display: flex; justify-content: space-between; font-size: 11.5px; color: #64748b; width: 100%; transition: border-color 0.5s ease; }
+        .vision-stats-inline b { font-family: "Courier New", Courier, monospace; font-size: 13.5px; margin-left: 4px; }
+        .vision-stats-inline b.before { color: #0f172a; }
+        .vision-stats-inline b.after { color: #0284c7; transition: color 0.5s ease; }
+        
+        .pd-box { text-align: center; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .pd-box .value { color: #0284c7; }
+
+        /* TRỢ LÝ AI DỊCH ĐƠN KÍNH */
+        .ai-box { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 16px; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 20px; }
+        .ai-title { font-size: 11px; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .ai-content { font-size: 14px; font-weight: 600; color: #15803d; line-height: 1.5; }
+
+        /* NÚT LẬT THẺ ICON MŨI TÊN */
+        .btn-flip-icon { margin: auto auto 0 auto; width: 46px; height: 46px; border-radius: 50%; background: #f1f5f9; color: #0f172a; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); flex-shrink: 0; }
+        .btn-flip-icon:active { transform: scale(0.9); background: #e2e8f0; }
+        .btn-flip-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* NÚT LƯU ẢNH */
+        .btn-download { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.15); padding: 14px 32px; border-radius: 100px; font-size: 15px; font-weight: 800; letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1); margin-top: 10px; }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); background: rgba(15, 23, 42, 1); }
+        .btn-download:active { transform: scale(0.92); }
+        .btn-download svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+        #imageOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); animation: fadeIn 0.3s ease; overflow-y: auto; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        #resultImage { max-width: 100%; max-height: 85vh; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); user-select: none; -webkit-user-select: none; object-fit: contain; }
+        .overlay-text { color: #ffffff; font-size: 15px; font-weight: 800; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; line-height: 1.5; flex-shrink: 0; }
+        .btn-close-overlay { margin-top: 15px; padding: 12px 32px; border-radius: 100px; border: 2px solid #ffffff; background: transparent; color: #ffffff; font-weight: 800; font-size: 14px; cursor: pointer; transition: all 0.2s ease; flex-shrink: 0;}
+        .btn-close-overlay:active { background: #ffffff; color: #000000; }
+    </style>
+</head>
+<body>
+    
+    <div class="flip-container" id="captureContainer">
+        <div class="flipper" id="cardFlipper">
+            
+            <!-- ====== MẶT TRƯỚC ====== -->
+            <div class="glass-card front" id="cardFront">
+                <div class="card-header">
+                    <div class="card-title">ĐƠN KÍNH</div>
+                    <div class="card-subtitle">THÔNG SỐ KHÚC XẠ</div>
+                </div>
+                <div class="card-body">
+                    <div class="warning-box" id="warningBox">
+                        ⚠️ Đơn kính này đã quá 6 tháng. Độ cận/loạn của bạn có thể đã thay đổi, vui lòng đến đo lại thị lực!
+                    </div>
+
+                    <div class="patient-info" id="front-info">
+                        <div class="info-group full-width">
+                            <span class="label">Họ và tên</span>
+                            <span class="value name" id="p-name">Đang tải...</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="label">Tuổi</span>
+                            <span class="value" id="p-age">--</span>
+                        </div>
+                        <div class="info-group">
+                            <span class="label">Ngày khám</span>
+                            <span class="value" id="p-date">--/--/----</span>
+                        </div>
+                    </div>
+
+                    <div class="eye-grid" id="front-eye-grid">
+                        <div class="eye-row">
+                            <div class="eye-badge">MP</div>
+                            <div class="eye-metrics">
+                                <span class="label">SPH / CYL x AXIS</span>
+                                <span class="value" id="p-mp">---</span>
+                                <!-- THỊ LỰC CHUYỂN VỀ MẶT TRƯỚC -->
+                                <div class="vision-stats-inline">
+                                    <div>Trước kính: <b class="before" id="p-tlkk-mp">---</b></div>
+                                    <div>Sau kính: <b class="after" id="p-tl-mp">---</b></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="eye-row">
+                            <div class="eye-badge">MT</div>
+                            <div class="eye-metrics">
+                                <span class="label">SPH / CYL x AXIS</span>
+                                <span class="value" id="p-mt">---</span>
+                                <!-- THỊ LỰC CHUYỂN VỀ MẶT TRƯỚC -->
+                                <div class="vision-stats-inline">
+                                    <div>Trước kính: <b class="before" id="p-tlkk-mt">---</b></div>
+                                    <div>Sau kính: <b class="after" id="p-tl-mt">---</b></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pd-box" id="front-pd-box">
+                        <span class="label">Khoảng cách đồng tử (PD)</span>
+                        <div class="value" style="font-size: 20px; margin-top: 4px;">
+                            <span id="p-pd">--</span> <span style="font-size: 14px;">mm</span>
+                        </div>
+                    </div>
+
+                    <!-- NÚT MŨI TÊN (LẬT RA SAU) -->
+                    <button class="btn-flip-icon" onclick="document.getElementById('captureContainer').classList.add('flipped')" title="Xem chi tiết">
+                        <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ====== MẶT SAU ====== -->
+            <div class="glass-card back" id="cardBack">
+                <div class="card-header">
+                    <div class="card-title" style="font-size: 20px;">CHI TIẾT MẮT</div>
+                    <div class="card-subtitle">CHẨN ĐOÁN & LỜI DẶN</div>
+                </div>
+                <div class="card-body">
+                    
+                    <div class="info-row-full" id="box-cd" style="display: block;">
+                        <span class="label">Kết luận chẩn đoán</span>
+                        <div class="value" id="p-cd" style="color: #0284c7;">---</div>
+                    </div>
+
+                    <!-- BOX TRỢ LÝ AI (TỰ BIẾN MẤT KHI LƯU ẢNH) -->
+                    <div class="ai-box" id="ai-box">
+                        <div class="ai-title">💡 Giải thích Đơn kính</div>
+                        <div class="ai-content" id="ai-translation">Đang phân tích...</div>
+                    </div>
+
+                    <div class="info-row-full note" id="box-gc" style="display: block;">
+                        <span class="label">Lời dặn của Bác sĩ</span>
+                        <div class="value" id="p-gc" style="font-size: 14px; font-style: italic; color: #b45309; margin-top: 4px;">Không có ghi chú thêm.</div>
+                    </div>
+
+                    <!-- NÚT MŨI TÊN (LẬT LẠI TRƯỚC) -->
+                    <button class="btn-flip-icon" onclick="document.getElementById('captureContainer').classList.remove('flipped')" title="Quay lại">
+                        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Nút Tải Ảnh -->
+    <button class="btn-download" id="btnDownload">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        LƯU
+    </button>
+
+    <div id="imageOverlay">
+        <div class="overlay-text">👇 CHẠM VÀ NHẤN GIỮ VÀO ẢNH BÊN DƯỚI<br>ĐỂ LƯU VỀ ĐIỆN THOẠI</div>
+        <img id="resultImage" alt="Ảnh Đơn Kính" />
+        <button class="btn-close-overlay" id="btnCloseOverlay">ĐÓNG LẠI</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let encodedData = urlParams.get('data');
+            
+            let data = { 
+                ten: 'Khách Hàng', ngay: '--/--/----', tuoi: '--', 
+                mp: '---', mt: '---', pd: '--', cd: '', gc: '',
+                tlkk_mp: '---', tlkk_mt: '---', tl_mp: '---', tl_mt: '---'
+            };
+
+            if (encodedData) {
+                try {
+                    encodedData = encodedData.replace(/ /g, '+');
+                    const decodedStr = decodeURIComponent(escape(atob(encodedData)));
+                    data = { ...data, ...JSON.parse(decodedStr) };
+                } catch (e) { console.error("Lỗi giải mã Base64."); }
+            } 
+            else if (urlParams.has('ten')) {
+                const getParam = (key, fallback = "") => {
+                    const val = urlParams.get(key); return val ? decodeURIComponent(val) : fallback;
+                };
+                data.ten = getParam('ten', 'Khách Hàng'); data.ngay = getParam('ngay', '--/--/----'); data.tuoi = getParam('tuoi', '--');
+                data.mp = getParam('mp', '---'); data.mt = getParam('mt', '---'); data.pd = getParam('pd', '--');
+                data.cd = getParam('cd', ''); data.gc = getParam('gc', '');
+            }
+
+            document.getElementById('p-name').textContent = data.ten;
+            document.getElementById('p-date').textContent = data.ngay;
+            document.getElementById('p-age').textContent = data.tuoi;
+            document.getElementById('p-mp').textContent = data.mp;
+            document.getElementById('p-mt').textContent = data.mt;
+            document.getElementById('p-pd').textContent = data.pd;
+
+            if(data.cd) document.getElementById('p-cd').textContent = data.cd;
+            else document.getElementById('box-cd').style.display = 'none';
+
+            if(data.gc) document.getElementById('p-gc').textContent = data.gc;
+            else document.getElementById('box-gc').style.display = 'none';
+
+            document.getElementById('p-tlkk-mp').textContent = data.tlkk_mp;
+            document.getElementById('p-tlkk-mt').textContent = data.tlkk_mt;
+            document.getElementById('p-tl-mp').textContent = data.tl_mp;
+            document.getElementById('p-tl-mt').textContent = data.tl_mt;
+
+            // ==========================================
+            // AI GIẢI MÃ ĐƠN KÍNH (TỰ ĐỘNG THÊM KÝ HIỆU "º" CHO TRỤC)
+            // ==========================================
+            function parseEye(str) {
+                if(!str || str === '---' || str === '0.00' || str === '+0.00') return 'Mắt bình thường';
+                let parts = str.split('/');
+                let sph = parts[0] || ''; let cylAxis = parts[1] || '';
+                let cyl = cylAxis.split('x')[0] || '';
+                
+                // Trích xuất số độ trục và ép ký hiệu º
+                let axisRaw = cylAxis.split('x')[1] || '';
+                let axis = axisRaw.replace(/[^0-9]/g, '');
+
+                let res = [];
+                let sphNum = parseFloat(sph);
+                if(sphNum < 0) res.push(`bị <b>Cận ${Math.abs(sphNum).toFixed(2)} độ</b>`);
+                else if(sphNum > 0) res.push(`bị <b>Viễn ${Math.abs(sphNum).toFixed(2)} độ</b>`);
+
+                let cylNum = parseFloat(cyl);
+                if(cylNum !== 0 && !isNaN(cylNum)) {
+                    let astigStr = `kèm theo <b>Loạn thị ${Math.abs(cylNum).toFixed(2)} độ</b>`;
+                    if(axis) astigStr += ` ở trục <b>${axis}º</b>`;
+                    res.push(astigStr);
+                }
+                return res.join(' ') || 'Không xác định rõ';
+            }
+
+            let aiText = `• <b>Mắt phải:</b> Đang ${parseEye(data.mp)}.<br>• <b>Mắt trái:</b> Đang ${parseEye(data.mt)}.`;
+            document.getElementById('ai-translation').innerHTML = aiText;
+
+            // LOGIC CẢNH BÁO
+            if(data.ngay && data.ngay !== '--/--/----') {
+                const parts = data.ngay.split('/');
+                if(parts.length === 3) {
+                    const examDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                    const today = new Date();
+                    let monthsDiff = (today.getFullYear() - examDate.getFullYear()) * 12 + (today.getMonth() - examDate.getMonth());
+                    if (today.getDate() < examDate.getDate()) monthsDiff--;
+                    if(monthsDiff >= 6) {
+                        document.body.classList.add('expired');
+                        document.getElementById('warningBox').style.display = 'block';
+                        document.querySelector('.card-header .card-subtitle').innerText = "ĐƠN KÍNH ĐÃ QUÁ HẠN";
+                    }
+                }
+            }
+
+            // =======================================================
+            // THUẬT TOÁN "GHÉP XƯƠNG" - RÁP MẶT SAU VÀO TRƯỚC (LOẠI BỎ AI BOX)
+            // =======================================================
+            const btnDownload = document.getElementById('btnDownload');
+            const flipperContainer = document.getElementById('cardFlipper');
+            const overlay = document.getElementById('imageOverlay');
+            const resultImage = document.getElementById('resultImage');
+            const btnCloseOverlay = document.getElementById('btnCloseOverlay');
+
+            btnDownload.addEventListener('click', async function() {
+                const originalHtml = btnDownload.innerHTML;
+                btnDownload.innerHTML = 'ĐANG XỬ LÝ...';
+                btnDownload.style.opacity = '0.7';
+                btnDownload.style.pointerEvents = 'none';
+
+                await document.fonts.ready;
+                const retinaScale = window.devicePixelRatio ? window.devicePixelRatio * 2 : 4;
+
+                html2canvas(flipperContainer, {
+                    scale: retinaScale, 
+                    backgroundColor: 'transparent',
+                    useCORS: true,
+                    onclone: function(clonedDoc) {
+                        // 1. Phá khối 3D để thẻ hiện ra thẳng băng
+                        const container = clonedDoc.getElementById('cardFlipper');
+                        container.style.transform = 'none';
+                        container.style.display = 'block';
+
+                        const frontCard = clonedDoc.querySelector('.front');
+                        frontCard.style.position = 'relative';
+                        frontCard.style.transform = 'none';
+                        frontCard.style.boxShadow = 'none';
+                        
+                        // 2. Chuyển "Chẩn đoán" và "Ghi chú" sang mặt trước
+                        const boxCd = clonedDoc.getElementById('box-cd');
+                        const boxGc = clonedDoc.getElementById('box-gc');
+
+                        // Cắm sau khối thông tin Khách hàng
+                        clonedDoc.getElementById('front-info').insertAdjacentElement('afterend', boxCd);
+                        // Cắm sau khối PD đồng tử
+                        clonedDoc.getElementById('front-pd-box').insertAdjacentElement('afterend', boxGc);
+
+                        // 3. Xóa sổ vĩnh viễn Mặt sau, nút Mũi tên và Trợ lý AI trên tấm ảnh
+                        clonedDoc.querySelector('.back').remove();
+                        clonedDoc.querySelectorAll('.btn-flip-icon').forEach(btn => btn.remove());
+
+                        // 4. Ép màu cứng để giữ sắc độ nét trên IOS/Zalo
+                        const isExpired = clonedDoc.body.classList.contains('expired');
+                        const header = frontCard.querySelector('.card-header');
+                        if(header) { header.style.backgroundColor = isExpired ? '#ef4444' : '#0284c7'; header.style.opacity = '1'; }
+                        
+                        clonedDoc.querySelectorAll('.eye-badge').forEach(b => {
+                            b.style.backgroundColor = isExpired ? '#ef4444' : '#0284c7'; b.style.boxShadow = 'none'; b.style.opacity = '1';
+                        });
+                        clonedDoc.querySelectorAll('.vision-stats-inline b.after').forEach(b => {
+                            b.style.color = isExpired ? '#ef4444' : '#0284c7';
+                        });
+                        clonedDoc.querySelectorAll('.vision-stats-inline').forEach(v => {
+                            v.style.borderTopColor = isExpired ? 'rgba(239, 68, 68, 0.2)' : 'rgba(2, 132, 199, 0.2)';
+                        });
+                    }
+                }).then(canvas => {
+                    const imageBase64 = canvas.toDataURL("image/png", 1.0);
+                    const safeName = data.ten.trim().replace(/\s+/g, '_');
+                    const fileName = `DonKinh_${safeName}.png`;
+
+                    resultImage.src = imageBase64;
+
+                    canvas.toBlob(blob => {
+                        const file = new File([blob], fileName, { type: "image/png" });
+
+                        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                            navigator.share({ files: [file], title: fileName }).then(() => {
+                                resetBtn('✔ ĐÃ LƯU', originalHtml);
+                            }).catch(() => {
+                                overlay.style.display = 'flex'; resetBtn(originalHtml, originalHtml);
+                            });
+                        } else {
+                            const link = document.createElement('a'); link.href = imageBase64; link.download = fileName;
+                            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+
+                            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) { overlay.style.display = 'flex'; }
+                            resetBtn('✔ ĐÃ LƯU', originalHtml);
+                        }
+                    }, 'image/png');
+                }).catch(err => {
+                    console.error("Lỗi xuất ảnh: ", err); resetBtn('❌ LỖI', originalHtml);
+                });
+            });
+
+            btnCloseOverlay.addEventListener('click', function() { overlay.style.display = 'none'; });
+            function resetBtn(msg, originalHtml) { btnDownload.innerHTML = msg; setTimeout(() => { btnDownload.innerHTML = originalHtml; btnDownload.style.opacity = '1'; btnDownload.style.pointerEvents = 'auto'; }, 2000); }
+        });
+    </script>
+</body>
+</html>
