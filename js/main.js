@@ -347,6 +347,63 @@ function setupUIEventListeners() {
             openDetailModal(card.getAttribute('data-index'));
         }
     });
+	// ==========================================
+    // LOGIC: KÉO ĐỂ LÀM MỚI (PULL-TO-REFRESH)
+    // ==========================================
+    let startY = 0; let currentY = 0; let isPulling = false;
+    const ptrSpinner = document.getElementById('pullToRefresh');
+    const dashboardView = document.getElementById('dashboardView');
+
+    document.addEventListener('touchstart', (e) => {
+        // Chỉ cho phép kéo khi đang cuộn ở tít trên cùng (scrollY === 0) và đang ở trang chủ
+        if (window.scrollY === 0 && dashboardView.style.display !== 'none') {
+            startY = e.touches[0].clientY;
+            currentY = startY;
+            isPulling = true;
+            ptrSpinner.classList.remove('refreshing', 'resetting');
+            ptrSpinner.style.transition = 'none'; // Bắt đầu bám sát ngón tay
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isPulling) return;
+        currentY = e.touches[0].clientY;
+        const pullDistance = currentY - startY;
+
+        // Nếu kéo hướng xuống dưới
+        if (pullDistance > 0 && window.scrollY === 0) {
+            // Lực cản (Resistance): Kéo 10px thì vòng tròn chỉ di chuyển 4px, tạo cảm giác mút tay
+            let visualPull = pullDistance * 0.4; 
+            if (visualPull > 60) visualPull = 60 + (visualPull - 60) * 0.1; // Cản cực mạnh khi kéo quá đà
+
+            ptrSpinner.style.opacity = Math.min(visualPull / 50, 1);
+            ptrSpinner.style.transform = `translateX(-50%) translateY(${visualPull - 40}px) rotate(${visualPull * 3}deg)`;
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', async () => {
+        if (!isPulling) return;
+        isPulling = false;
+        const pullDistance = currentY - startY;
+
+        // Nếu quãng đường vuốt xuống đủ dài (> 120px) -> Kích hoạt load dữ liệu
+        if (pullDistance > 120 && window.scrollY === 0) {
+            ptrSpinner.classList.add('refreshing');
+            
+            // Chờ gọi dữ liệu từ Firebase
+            await loadDashboardData(); 
+            
+            // Giữ vòng tròn xoay thêm 0.6s để báo hiệu hoàn thành rồi giấu đi
+            setTimeout(() => {
+                ptrSpinner.classList.remove('refreshing');
+                ptrSpinner.classList.add('resetting');
+                showToast("Đã cập nhật dữ liệu mới!");
+            }, 600); 
+        } else if (pullDistance > 0) {
+            // Kéo nhẹ chưa đủ lực -> Bỏ qua, thu vòng tròn về
+            ptrSpinner.classList.add('resetting');
+        }
+    });
 }
 
 function setupFormEventListeners() {
