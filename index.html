@@ -308,12 +308,14 @@
         
         <div class="modal-sidebar">
             <div class="sidebar-top-block" style="width: 100%;">
-                <div class="sidebar-top" style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="sidebar-top" style="margin-bottom: 28px;">
                     <span class="close-modal" id="btnCloseModal">← QUAY LẠI</span>
-                    <canvas id="modalQrCode" style="width: 70px; height: 70px; display: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></canvas>
                 </div>
                 
-                <h1 id="modalPatientName" class="massive-name">---</h1>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px;">
+                    <h1 id="modalPatientName" class="massive-name" style="margin-bottom: 0;">---</h1>
+                    <canvas id="modalQrCode" style="width: 65px; height: 65px; display: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;"></canvas>
+                </div>
                 <div style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.02em; text-transform: uppercase;">
                     <span id="modalPatientTuoi">--</span> tuổi | <span id="modalPatientGioi">--</span> | <span id="modalPatientSdt">--</span>
                 </div>
@@ -324,7 +326,6 @@
                     <button class="btn btn-dark" id="modalBtnExportImg">XUẤT ẢNH</button>
                     <button class="btn btn-green" id="modalBtnPrint">IN ĐƠN KÍNH</button>
                 </div>
-					<button class="btn btn-dashed" id="modalBtnPreviewMobile" style="display: none; width: 100%; margin-top: 16px; border-color: var(--text-main); color: var(--text-main); font-weight: 900;">🔍 XEM TRƯỚC BẢN IN TỜ KÍNH</button>
             </div>
 				
             <div class="sidebar-bottom-block" style="margin-top: auto; width: 100%;">
@@ -333,6 +334,7 @@
                 <div id="modalPatientDiag" class="patient-diag-text" style="font-size: 15px; margin-bottom: 12px; line-height: 1.4;">---</div>
                 
                 <div id="modalTypographicGrid"></div>
+				<button class="btn btn-dashed" id="modalBtnPreviewMobile" style="display: none; width: 100%; margin-top: 32px; border-color: var(--text-main); color: var(--text-main); font-weight: 900; background: var(--bg-surface);">🔍 XEM BẢN IN</button>
             </div>
         </div>
 
