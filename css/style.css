@@ -468,11 +468,24 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
     .main-wrapper { padding: 24px 16px; }
     .login-box { padding: 40px 24px; border-radius: 0; border: none; }
     
-    /* Dashboard Header & Grid */
-    .dashboard-header { flex-direction: column; align-items: flex-start; gap: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px; }
-    .dashboard-header h2 { font-size: 28px; }
-    .dashboard-header > div { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-    .dashboard-header .btn { width: 100%; margin: 0 !important; }
+    /* Dashboard Header & Grid (Đưa nút bấm lên ngang hàng tiêu đề) */
+    .dashboard-header { 
+        flex-direction: row !important; /* Bắt buộc xếp ngang */
+        align-items: center !important; 
+        justify-content: space-between !important; /* Đẩy tiêu đề và nút ra 2 mép */
+        gap: 12px; 
+        border-bottom: 1px solid var(--border-color); 
+        padding-bottom: 16px; 
+    }
+    .dashboard-header h2 { font-size: 24px; margin: 0; }
+    
+    .dashboard-header > div { 
+        width: auto !important; 
+        display: flex; 
+        flex-direction: row !important; /* Nút nháp và nút tạo mới xếp ngang */
+        gap: 8px; 
+    }
+    .dashboard-header .btn { width: auto; margin: 0 !important; }
     /* Chỉnh sửa: Loại bỏ toàn bộ viền thừa để cân đối thẻ kết quả */
     .dashboard-grid { 
         grid-template-columns: 1fr; 
@@ -647,21 +660,19 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
     /* Actions bar dính đáy */
     .actions { padding: 16px; justify-content: space-between; }
     #formView { padding-bottom: 180px; } 
-
-    /* Chỉnh sửa: Nút Create New nổi, căn giữa hoàn hảo trên Mobile */
+/* Triệt tiêu trạng thái nổi bám đáy của nút Tạo Đơn Mới trên Mobile */
     #btnCreateNew { 
-        position: fixed !important; 
-        bottom: 24px; 
-        left: 16px !important; /* Ép lề trái 16px */
-        right: 16px !important; /* Ép lề phải 16px */
-        width: calc(100% - 32px) !important; /* Tự động tính toán chiều rộng đều 2 bên */
-        box-shadow: 0 12px 32px rgba(0,0,0,0.15) !important; 
-        z-index: 2000; 
-        padding: 16px 24px !important; 
-        justify-content: center !important; /* Căn giữa chữ và icon */
+        position: relative !important; /* Hủy fixed */
+        bottom: auto; left: auto; right: auto; 
+        width: auto !important; 
+        padding: 10px 16px !important; /* Thu nhỏ nút lại cho vừa vặn */
+        font-size: 11px !important; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; 
+        border-radius: var(--radius) !important;
+        z-index: 1;
     }
-    [data-theme="dark"] #btnCreateNew { box-shadow: 0 12px 32px rgba(255,255,255,0.25) !important; }
-    #btnCreateNew:active { transform: scale(0.98) !important; }
+    #btnCreateNew::after { display: none !important; } /* Tắt icon dấu + to đùng phía sau */
+    #btnCreateNew:active { transform: scale(0.95) !important; }
     
     /* Toasts trượt giữa màn hình */
     #toastContainer { top: 16px; right: 16px; left: 16px; align-items: center; }
