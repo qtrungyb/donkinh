@@ -1,5 +1,5 @@
 // Thay đổi version này mỗi khi bạn đẩy code mới lên Github (VD: 'donkinh-v2', 'donkinh-v3')
-const CACHE_NAME = 'donkinh-v3.3';
+const CACHE_NAME = 'donkinh-v3.4';
 
 // Danh sách các file cần lưu Cache để chạy offline và tải nhanh
 const urlsToCache = [
