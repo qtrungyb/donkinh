@@ -22,7 +22,8 @@
     
     <!-- Thư viện HTML2Canvas dùng để xuất ảnh -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+    <!-- Thư viện tạo mã QR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <!-- NHÚNG FILE CSS -->
     <link rel="stylesheet" href="./css/style.css">
 </head>
@@ -307,8 +308,9 @@
         
         <div class="modal-sidebar">
             <div class="sidebar-top-block" style="width: 100%;">
-                <div class="sidebar-top" style="margin-bottom: 28px;">
+                <div class="sidebar-top" style="margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start;">
                     <span class="close-modal" id="btnCloseModal">← QUAY LẠI</span>
+                    <canvas id="modalQrCode" style="width: 70px; height: 70px; display: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></canvas>
                 </div>
                 
                 <h1 id="modalPatientName" class="massive-name">---</h1>
@@ -322,8 +324,9 @@
                     <button class="btn btn-dark" id="modalBtnExportImg">XUẤT ẢNH</button>
                     <button class="btn btn-green" id="modalBtnPrint">IN ĐƠN KÍNH</button>
                 </div>
+					<button class="btn btn-dashed" id="modalBtnPreviewMobile" style="display: none; width: 100%; margin-top: 16px; border-color: var(--text-main); color: var(--text-main); font-weight: 900;">🔍 XEM TRƯỚC BẢN IN TỜ KÍNH</button>
             </div>
-
+				
             <div class="sidebar-bottom-block" style="margin-top: auto; width: 100%;">
                 <div class="meta-separator" style="margin: 0 0 20px 0; width: 100%;"></div>
                 <div class="meta-label" style="margin-bottom: 4px;">Chẩn đoán</div>
@@ -334,6 +337,7 @@
         </div>
 
         <div class="modal-preview-workspace">
+			<button id="btnClosePreviewMobile" class="btn" style="display: none; position: absolute; top: 16px; left: 16px; z-index: 10; border-radius: 100px; padding: 12px 24px; font-size: 11px; background: var(--text-main); color: var(--bg-surface); border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">← ĐÓNG BẢN IN</button>
             <div class="preview-canvas-wrapper">
                 <iframe id="modalIframe"></iframe>
             </div>
