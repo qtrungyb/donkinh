@@ -312,13 +312,20 @@
                     <span class="close-modal" id="btnCloseModal">← QUAY LẠI</span>
                 </div>
                 
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px;">
-					<h1 id="modalPatientName" class="massive-name" style="margin-bottom: 0; flex: 1; word-break: break-word;">---</h1>
-					
-					<canvas id="modalQrCode" style="width: 110px; height: 110px; display: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0; margin-top: 4px;"></canvas>
-				</div>
-                <div style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.02em; text-transform: uppercase;">
-                    <span id="modalPatientTuoi">--</span> tuổi | <span id="modalPatientGioi">--</span> | <span id="modalPatientSdt">--</span>
+                <!-- Khối bao bọc 2 cột (Trái: Thông tin, Phải: QR) -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
+                    
+                    <!-- Cột trái: Nhốt chung Họ tên và Thông tin vào đây -->
+                    <div style="display: flex; flex-direction: column; flex: 1;">
+                        <h1 id="modalPatientName" class="massive-name" style="margin-bottom: 8px; word-break: break-word;">---</h1>
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-main); letter-spacing: 0.02em; text-transform: uppercase;">
+                            <span id="modalPatientTuoi">--</span> tuổi | <span id="modalPatientGioi">--</span> | <span id="modalPatientSdt">--</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Cột phải: Mã QR đứng độc lập -->
+                    <canvas id="modalQrCode" style="width: 110px; height: 110px; display: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); flex-shrink: 0;"></canvas>
+                    
                 </div>
                 
                 <div class="modal-actions-horizontal">
