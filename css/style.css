@@ -578,10 +578,10 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
 
     /* 9.3 TỐI ƯU UX: BẢN XEM TRƯỚC THÀNH NÚT BẤM DẠNG FULLSCREEN TRÊN MOBILE */
     .modal-container { 
-        display: flex !important; 
-        flex-direction: column !important; 
-        height: 100vh !important; 
+        display: block !important; /* Đổi từ flex sang block để scroll tự nhiên nhất trên điện thoại */
+        height: 100% !important; /* Dùng 100% để tránh lỗi kẹt thanh điều hướng trên Safari/Chrome */
         overflow-y: auto !important; 
+        -webkit-overflow-scrolling: touch; /* Bật gia tốc cuộn mượt mà cho iPhone */
         background: var(--bg-body); 
         border-radius: 0; 
     }
@@ -589,8 +589,10 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
     .modal-sidebar { 
         width: 100% !important; 
         border: none !important; 
-        padding: 24px 20px !important; 
+        padding: 24px 20px 40px 20px !important; /* Thêm lề dưới 40px để khi cuộn xuống cùng không bị sát mép */
         height: auto !important; 
+        min-height: 100%; 
+        overflow: visible !important; /* CỰC KỲ QUAN TRỌNG: Ghi đè lỗi giấu nội dung từ PC, giúp nội dung hiện ra để cuộn */
         background: var(--bg-surface); 
     }
     
