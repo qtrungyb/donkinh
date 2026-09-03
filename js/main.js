@@ -347,65 +347,6 @@ function setupUIEventListeners() {
             openDetailModal(card.getAttribute('data-index'));
         }
     });
-	// ==========================================
-    // LOGIC QUÉT MÃ QR BẰNG CAMERA ĐIỆN THOẠI
-    // ==========================================
-    const btnScanQR = document.getElementById('btnScanQR');
-    const scannerModal = document.getElementById('qrScannerModal');
-    const btnCloseScanner = document.getElementById('btnCloseScanner');
-    let html5QrcodeScanner;
-
-    if (btnScanQR) {
-        btnScanQR.addEventListener('click', () => {
-            scannerModal.style.display = 'flex';
-            // Khởi tạo Camera
-            html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: {width: 250, height: 250} }, false);
-            html5QrcodeScanner.render(onScanSuccess);
-        });
-    }
-
-    if (btnCloseScanner) {
-        btnCloseScanner.addEventListener('click', () => {
-            if (html5QrcodeScanner) html5QrcodeScanner.clear();
-            scannerModal.style.display = 'none';
-        });
-    }
-
-    function onScanSuccess(decodedText, decodedResult) {
-        // Tắt camera ngay khi quét thành công
-        if (html5QrcodeScanner) html5QrcodeScanner.clear();
-        scannerModal.style.display = 'none';
-        
-        try {
-            // Phân tích dữ liệu từ URL của mã QR
-            const url = new URL(decodedText);
-            let encodedData = url.searchParams.get('data');
-            if (encodedData) {
-                encodedData = encodedData.replace(/ /g, '+');
-                const decodedStr = decodeURIComponent(escape(atob(encodedData)));
-                const pData = JSON.parse(decodedStr);
-                
-                // Mở Form tạo mới và tự động điền toàn bộ dữ liệu vừa quét được
-                showFormView();
-                DOM.form.hoTen.value = pData.ten || '';
-                DOM.form.tuoi.value = pData.tuoi || '';
-                DOM.form.sdt.value = pData.sdt || '';
-                
-                // Kích hoạt sự kiện để hiển thị Clear Buttons & Gợi ý
-                ['hoTen', 'tuoi', 'sdt'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.dispatchEvent(new Event('input'));
-                });
-                
-                showToast("✔ Đã nạp thành công dữ liệu từ QR cũ!");
-            } else {
-                showToast("Mã QR không chứa dữ liệu của hệ thống!", "error");
-            }
-        } catch (err) {
-            console.error(err);
-            showToast("Lỗi giải mã QR!", "error");
-        }
-    }
 }
 
 function setupFormEventListeners() {
