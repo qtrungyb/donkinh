@@ -576,47 +576,52 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
         flex-shrink: 0; /* Quan trọng: Ngăn thẻ bị bóp méo khi đưa vào khung có thanh cuộn */
     }
 
-    /* 9.3 CẢI TIẾN: KHÔI PHỤC VÀ TỐI ƯU MODAL CHI TIẾT (HIỂN THỊ PREVIEW) */
+    /* 9.3 TỐI ƯU UX: BẢN XEM TRƯỚC THÀNH NÚT BẤM DẠNG FULLSCREEN TRÊN MOBILE */
     .modal-container { 
         display: flex !important; 
         flex-direction: column !important; 
         height: 100vh !important; 
-        overflow-y: auto !important; /* Cho phép cuộn toàn bộ màn hình từ trên xuống dưới */
+        overflow-y: auto !important; 
         background: var(--bg-body); 
         border-radius: 0; 
     }
     
     .modal-sidebar { 
         width: 100% !important; 
-        border: none !important;
-        border-bottom: 2px solid var(--border-light) !important; /* Tạo đường viền ngăn cách với Preview */
-        padding: 24px 16px !important; 
-        
-        /* CỰC KỲ QUAN TRỌNG: Đổi từ height: 100% thành auto để chừa chỗ cho Bản xem trước */
+        border: none !important; 
+        padding: 24px 20px !important; 
         height: auto !important; 
-        overflow-y: visible !important; 
         background: var(--bg-surface); 
     }
     
     .massive-name { font-size: 26px; line-height: 1.2; margin-bottom: 8px; }
     
-    /* Mở khóa và hiển thị Iframe Xem trước ở nửa dưới màn hình */
+    /* 1. Ẩn Iframe đi mặc định trên mobile để giải phóng không gian cho thông tin */
     .modal-preview-workspace { 
-        display: flex !important; 
-        width: 100% !important;
-        height: 60vh !important; /* Khung Preview sẽ chiếm 60% chiều cao màn hình điện thoại */
-        padding: 16px !important;
-        align-items: flex-start;
+        display: none !important; 
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        height: 100vh !important;
+        z-index: 3000;
         background: #e4e4e7;
+        padding: 80px 16px 24px 16px !important; /* Chừa không gian 80px bên trên cho nút Đóng */
     }
     
-    /* Ép khung trắng chứa nội dung Đơn kính mở rộng hết cỡ trong vùng 60vh */
     .preview-canvas-wrapper {
         width: 100%;
         height: 100%;
         max-height: none;
         border-radius: 8px;
     }
+    
+    /* 2. Kích hoạt hiển thị nút Bấm "Xem trước", "Đóng" và "Mã QR" trên Mobile */
+    #modalBtnPreviewMobile { display: block !important; }
+    #btnClosePreviewMobile { display: block !important; }
+    #modalQrCode { display: block !important; } 
+    
+    /* 3. THUẬT TOÁN CHUYỂN ĐỔI: Khi javascript thêm class "show-preview" vào container */
+    .modal-container.show-preview .modal-sidebar { display: none !important; } /* Giấu sidebar thông tin đi */
+    .modal-container.show-preview .modal-preview-workspace { display: flex !important; } /* Bung Iframe Xem trước ra Fullscreen */
     /* Chỉnh sửa: Cụm nút Modal - Khử margin âm gây lỗi đè vạch kẻ */
     .modal-actions-horizontal { 
         display: grid !important; 
