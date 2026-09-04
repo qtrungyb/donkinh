@@ -411,6 +411,9 @@ function setupUIEventListeners() {
     // ==========================================
     let pressTimer;
     let isLongPress = false;
+    let ctxJustOpened = false; // Cờ chặn sự kiện click ảo khi vừa thả tay
+    let touchStartX = 0;
+    let touchStartY = 0;
     const ctxModal = document.getElementById('hapticContextMenu');
     const ctxName = document.getElementById('ctxPatientName');
     const ctxEdit = document.getElementById('ctxEditBtn');
@@ -423,11 +426,16 @@ function setupUIEventListeners() {
             if (!card || DOM.dashboard.list.contains(card) === false) return;
             
             isLongPress = false;
-            card.classList.add('haptic-active'); // Hiệu ứng bóp lún thẻ
+            // Lưu lại tọa độ lúc bắt đầu chạm
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            card.classList.add('haptic-active'); 
 
             pressTimer = setTimeout(() => {
                 isLongPress = true;
-                if (navigator.vibrate) navigator.vibrate(40); // Rung nảy nhẹ phần cứng
+                ctxJustOpened = true; // Bật khiên chống click ảo
+                
+                if (navigator.vibrate) navigator.vibrate(40); 
                 
                 const index = card.getAttribute('data-index');
                 currentCtxIndex = index;
@@ -437,7 +445,11 @@ function setupUIEventListeners() {
                 
                 ctxModal.style.display = 'flex';
                 setTimeout(() => ctxModal.classList.add('show'), 10);
-            }, 450); // Ấn giữ gần 0.5s thì bung menu
+                
+                // Tắt khiên sau 500ms (Đủ để ngón tay thả ra mà không bị nhận nhầm)
+                setTimeout(() => { ctxJustOpened = false; }, 500);
+
+            }, 450); 
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
@@ -445,26 +457,37 @@ function setupUIEventListeners() {
             const card = e.target.closest('.result-card');
             if (card) card.classList.remove('haptic-active');
             
-            // Nếu là ấn giữ, chặn hành động Click (mở Detail Modal) mặc định
-            if (isLongPress && card) { e.preventDefault(); e.stopPropagation(); }
+            if (isLongPress && card) { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+            }
         });
 
-        document.addEventListener('touchmove', () => {
-            // Đang lướt mà lỡ chạm thì hủy ấn giữ
-            clearTimeout(pressTimer);
-            const activeCard = document.querySelector('.result-card.haptic-active');
-            if (activeCard) activeCard.classList.remove('haptic-active');
+        document.addEventListener('touchmove', (e) => {
+            // Tính toán quãng đường ngón tay bị xê dịch (chống rung tay)
+            const moveX = Math.abs(e.touches[0].clientX - touchStartX);
+            const moveY = Math.abs(e.touches[0].clientY - touchStartY);
+            
+            // Dung sai 10px: Chỉ hủy lệnh ấn giữ nếu ngón tay trượt đi thực sự (> 10px)
+            if (moveX > 10 || moveY > 10) {
+                clearTimeout(pressTimer);
+                const activeCard = document.querySelector('.result-card.haptic-active');
+                if (activeCard) activeCard.classList.remove('haptic-active');
+            }
         }, { passive: true });
 
-        // Tắt Menu khi bấm ra ngoài
+        // Tắt Menu khi bấm ra ngoài vùng tối
         ctxModal.addEventListener('click', (e) => {
+            // NẾU VỪA MỚI THẢ TAY RA -> CHẶN ĐÓNG POPUP
+            if (ctxJustOpened) return; 
+            
             if (e.target === ctxModal) {
                 ctxModal.classList.remove('show');
                 setTimeout(() => ctxModal.style.display = 'none', 250);
             }
         });
 
-        // Xử lý Sự kiện Nút
+        // Xử lý Sự kiện Bấm Nút bên trong Menu
         ctxEdit.addEventListener('click', () => {
             ctxModal.classList.remove('show');
             setTimeout(() => { ctxModal.style.display = 'none'; startEditing(currentCtxIndex); }, 250);
