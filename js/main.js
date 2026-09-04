@@ -344,6 +344,8 @@ function setupUIEventListeners() {
         }
         const card = e.target.closest('.result-card');
         if (card && DOM.dashboard.list.contains(card)) {
+            // Chặn mở Detail nếu Context Menu đang hiện
+            if (document.getElementById('hapticContextMenu') && document.getElementById('hapticContextMenu').classList.contains('show')) return;
             openDetailModal(card.getAttribute('data-index'));
         }
     });
@@ -403,6 +405,129 @@ function setupUIEventListeners() {
             // Kéo nhẹ chưa đủ lực -> Bỏ qua, thu vòng tròn về
             ptrSpinner.classList.add('resetting');
         }
+    });
+	// ==========================================
+    // LOGIC: ẤN GIỮ MỞ CONTEXT MENU (HAPTIC TOUCH)
+    // ==========================================
+    let pressTimer;
+    let isLongPress = false;
+    const ctxModal = document.getElementById('hapticContextMenu');
+    const ctxName = document.getElementById('ctxPatientName');
+    const ctxCall = document.getElementById('ctxCallBtn');
+    const ctxEdit = document.getElementById('ctxEditBtn');
+    const ctxDel = document.getElementById('ctxDeleteBtn');
+    let currentCtxIndex = null;
+
+    if (ctxModal) {
+        document.addEventListener('touchstart', (e) => {
+            const card = e.target.closest('.result-card');
+            if (!card || DOM.dashboard.list.contains(card) === false) return;
+            
+            isLongPress = false;
+            card.classList.add('haptic-active'); // Hiệu ứng bóp lún thẻ
+
+            pressTimer = setTimeout(() => {
+                isLongPress = true;
+                if (navigator.vibrate) navigator.vibrate(40); // Rung nảy nhẹ phần cứng
+                
+                const index = card.getAttribute('data-index');
+                currentCtxIndex = index;
+                const item = AppState.currentSearchResults[index];
+                
+                ctxName.innerText = item.hoTen;
+                ctxCall.href = `tel:${item.sdt}`;
+                
+                ctxModal.style.display = 'flex';
+                setTimeout(() => ctxModal.classList.add('show'), 10);
+            }, 450); // Ấn giữ gần 0.5s thì bung menu
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            clearTimeout(pressTimer);
+            const card = e.target.closest('.result-card');
+            if (card) card.classList.remove('haptic-active');
+            
+            // Nếu là ấn giữ, chặn hành động Click (mở Detail Modal) mặc định
+            if (isLongPress && card) { e.preventDefault(); e.stopPropagation(); }
+        });
+
+        document.addEventListener('touchmove', () => {
+            // Đang lướt mà lỡ chạm thì hủy ấn giữ
+            clearTimeout(pressTimer);
+            const activeCard = document.querySelector('.result-card.haptic-active');
+            if (activeCard) activeCard.classList.remove('haptic-active');
+        }, { passive: true });
+
+        // Tắt Menu khi bấm ra ngoài
+        ctxModal.addEventListener('click', (e) => {
+            if (e.target === ctxModal) {
+                ctxModal.classList.remove('show');
+                setTimeout(() => ctxModal.style.display = 'none', 250);
+            }
+        });
+
+        // Xử lý Sự kiện Nút
+        ctxEdit.addEventListener('click', () => {
+            ctxModal.classList.remove('show');
+            setTimeout(() => { ctxModal.style.display = 'none'; startEditing(currentCtxIndex); }, 250);
+        });
+
+        ctxDel.addEventListener('click', async () => {
+            ctxModal.classList.remove('show');
+            setTimeout(async () => {
+                ctxModal.style.display = 'none';
+                AppState.currentSavedId = AppState.currentSearchResults[currentCtxIndex].id;
+                await deleteRecord();
+            }, 250);
+        });
+    }
+
+    // ==========================================
+    // LOGIC: VUỐT GẠT ĐỂ ẨN TOAST (SWIPE TO DISMISS)
+    // ==========================================
+    const toastContainer = document.getElementById('toastContainer');
+    let toastStartX = 0;
+    let activeToast = null;
+
+    toastContainer.addEventListener('touchstart', (e) => {
+        if (e.target.classList.contains('toast')) {
+            toastStartX = e.touches[0].clientX;
+            activeToast = e.target;
+            activeToast.style.transition = 'none'; // Bám sát ngón tay
+        }
+    }, { passive: true });
+
+    toastContainer.addEventListener('touchmove', (e) => {
+        if (!activeToast) return;
+        const currentX = e.touches[0].clientX;
+        const deltaX = currentX - toastStartX;
+        
+        // Chỉ cho phép vuốt sang phải
+        if (deltaX > 0) {
+            activeToast.style.transform = `translateX(${deltaX}px)`;
+            activeToast.style.opacity = 1 - (deltaX / 200); // Kéo càng xa càng mờ
+        }
+    }, { passive: true });
+
+    toastContainer.addEventListener('touchend', (e) => {
+        if (!activeToast) return;
+        const currentX = e.changedTouches[0].clientX;
+        const deltaX = currentX - toastStartX;
+
+        activeToast.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+        
+        // Nếu kéo qua một nửa (khoảng 80px), tạt văng nó ra ngoài luôn
+        if (deltaX > 80) {
+            activeToast.style.transform = 'translateX(120%)';
+            activeToast.style.opacity = 0;
+            const toastToRemove = activeToast;
+            setTimeout(() => { if (toastToRemove.parentNode) toastToRemove.parentNode.removeChild(toastToRemove); }, 200);
+        } else {
+            // Vuốt hụt lực -> Bật nảy về vị trí cũ
+            activeToast.style.transform = 'translateX(0)';
+            activeToast.style.opacity = 1;
+        }
+        activeToast = null;
     });
 }
 
@@ -733,16 +858,32 @@ function searchKinhDashboard() {
 // FORM LOGIC
 // ============================================================================
 function showFormView() {
-    DOM.views.dashboard.style.display = 'none';
+    DOM.views.dashboard.classList.add('slide-out-left');
     DOM.views.form.style.display = 'block';
+    DOM.views.form.classList.add('slide-in-right');
     resetForm();
+    
+    // Đợi Animation chạy xong rồi mới giấu Dashboard đi
+    setTimeout(() => {
+        DOM.views.dashboard.style.display = 'none';
+        DOM.views.dashboard.classList.remove('slide-out-left');
+        DOM.views.form.classList.remove('slide-in-right');
+    }, 350);
 }
 
 function showDashboardView() {
     DOM.views.dashboard.style.display = 'block';
-    DOM.views.form.style.display = 'none';
+    DOM.views.dashboard.classList.add('slide-in-left');
+    DOM.views.form.classList.add('slide-out-right');
     loadDashboardData(); 
     checkDraftStatus();
+    
+    // Đợi Form trượt ra ngoài xong rồi mới giấu đi
+    setTimeout(() => {
+        DOM.views.form.style.display = 'none';
+        DOM.views.dashboard.classList.remove('slide-in-left');
+        DOM.views.form.classList.remove('slide-out-right');
+    }, 350);
 }
 
 function resetForm() {
