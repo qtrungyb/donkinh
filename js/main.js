@@ -413,7 +413,6 @@ function setupUIEventListeners() {
     let isLongPress = false;
     const ctxModal = document.getElementById('hapticContextMenu');
     const ctxName = document.getElementById('ctxPatientName');
-    const ctxCall = document.getElementById('ctxCallBtn');
     const ctxEdit = document.getElementById('ctxEditBtn');
     const ctxDel = document.getElementById('ctxDeleteBtn');
     let currentCtxIndex = null;
@@ -435,7 +434,6 @@ function setupUIEventListeners() {
                 const item = AppState.currentSearchResults[index];
                 
                 ctxName.innerText = item.hoTen;
-                ctxCall.href = `tel:${item.sdt}`;
                 
                 ctxModal.style.display = 'flex';
                 setTimeout(() => ctxModal.classList.add('show'), 10);
