@@ -384,13 +384,25 @@
         </form>
     </div>
 </div>
-<!-- MODAL CONTEXT MENU (HAPTIC TOUCH) -->
-<div id="hapticContextMenu" class="modal-overlay" style="z-index: 4000; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(0,0,0,0.3);">
-    <div class="context-menu-box" style="background: var(--bg-surface); width: 250px; border-radius: 14px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: scale(0.8); opacity: 0; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-        <div id="ctxPatientName" style="padding: 16px; font-weight: 900; text-align: center; border-bottom: 1px solid var(--border-light); font-size: 13px; color: var(--text-muted); text-transform: uppercase;">Tên Bệnh Nhân</div>
-        <a href="#" id="ctxCallBtn" style="display: block; padding: 16px; text-align: center; text-decoration: none; color: #10B981; font-weight: 800; border-bottom: 1px solid var(--border-light); font-size: 15px;">📞 Gọi điện thoại</a>
-        <button id="ctxEditBtn" style="width: 100%; background: none; border: none; padding: 16px; font-weight: 700; color: var(--text-main); font-size: 15px; border-bottom: 1px solid var(--border-light); cursor: pointer;">✏️ Sửa Đơn Kính</button>
-        <button id="ctxDeleteBtn" style="width: 100%; background: none; border: none; padding: 16px; font-weight: 700; color: var(--danger-color); font-size: 15px; cursor: pointer;">🗑️ Xóa Hồ Sơ</button>
+<!-- MODAL CONTEXT MENU (HAPTIC TOUCH) - BOTTOM SHEET -->
+<div id="hapticContextMenu" class="modal-overlay" style="z-index: 4000; align-items: flex-end; justify-content: center; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: rgba(0,0,0,0.3);">
+    <div class="context-menu-box" style="background: var(--bg-surface); width: 100%; max-width: 380px; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(120%); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        
+        <!-- Tiêu đề Menu -->
+        <div id="ctxPatientName" style="padding: 18px 16px; font-weight: 900; text-align: center; border-bottom: 1px solid var(--border-light); font-size: 13px; color: var(--text-muted); text-transform: uppercase;">
+            Tên Bệnh Nhân
+        </div>
+        
+        <!-- Nút Sửa -->
+        <button id="ctxEditBtn" style="width: 100%; background: none; border: none; padding: 20px; font-weight: 800; color: var(--text-main); font-size: 15px; border-bottom: 1px solid var(--border-light); cursor: pointer; text-transform: uppercase;">
+            ✏️ Sửa Đơn Kính
+        </button>
+        
+        <!-- Nút Xóa -->
+        <button id="ctxDeleteBtn" style="width: 100%; background: none; border: none; padding: 20px; font-weight: 800; color: var(--danger-color); font-size: 15px; cursor: pointer; text-transform: uppercase;">
+            🗑️ Xóa Hồ Sơ
+        </button>
+        
     </div>
 </div>
 <!-- NHÚNG FILE JS CHÍNH CỦA ỨNG DỤNG -->
