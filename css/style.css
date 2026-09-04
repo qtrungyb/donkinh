@@ -736,3 +736,28 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
         opacity: 0 !important;
     }
     @keyframes ptrSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+	/* ==========================================
+       TỐI ƯU UX CHUYÊN SÂU: SLIDE PAGE, CONTEXT MENU, SWIPE TOAST
+       ========================================== */
+    /* 1. Hiệu ứng chuyển trang iOS */
+    .slide-in-right { animation: slideInR 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+    .slide-out-left { animation: slideOutL 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+    .slide-in-left { animation: slideInL 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+    .slide-out-right { animation: slideOutR 0.35s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+
+    @keyframes slideInR { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOutL { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30%); opacity: 0; } }
+    @keyframes slideInL { from { transform: translateX(-30%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes slideOutR { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+
+    /* 2. Hiệu ứng bóp thẻ & Haptic Context Menu */
+    .result-card { transition: transform 0.2s ease, filter 0.2s ease; }
+    .result-card.haptic-active { transform: scale(0.96); filter: brightness(0.9); }
+    
+    #hapticContextMenu.show .context-menu-box {
+        transform: scale(1) !important;
+        opacity: 1 !important;
+    }
+
+    /* 3. Hoạt ảnh vuốt Toast */
+    .toast { transition: transform 0.2s ease-out, opacity 0.2s ease-out; }
