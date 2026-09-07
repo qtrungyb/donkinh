@@ -466,9 +466,46 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
 .detail-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; border-bottom: 1px dashed var(--border-light); }
 .detail-value { font-family: "Courier New", Courier, monospace; font-size: 14px; font-weight: 700; color: var(--text-main); }
 
-.modal-preview-workspace { background: #e4e4e7; padding: 24px !important; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-[data-theme="dark"] .modal-preview-workspace { background: #111111; }
-.preview-canvas-wrapper { width: 100%; max-width: 600px; height: 100%; max-height: calc(100vh - 48px); background: #ffffff; border: 1px solid var(--border-color); display: block; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+/* TẠO NỀN MẶT BÀN (LƯỚI CHẤM BI CHUYÊN NGHIỆP) */
+.modal-preview-workspace { 
+    background-color: #f1f5f9;
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 24px 24px;
+    padding: 24px !important; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh; 
+    overflow: hidden; 
+}
+[data-theme="dark"] .modal-preview-workspace { 
+    background-color: #0f172a;
+    background-image: radial-gradient(#1e293b 1px, transparent 1px);
+}
+
+/* XÓA NỀN BAO BỌC IFRAME VÀ THÊM HIỆU ỨNG TRƯỢT MƯỢT MÀ */
+@keyframes paperSlideUp {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.preview-canvas-wrapper { 
+    width: 100%; 
+    max-width: 600px; 
+    height: 100%; 
+    max-height: calc(100vh - 48px); 
+    background: transparent; /* Để tờ giấy bên trong iframe tự toả bóng */
+    border: none; 
+    display: block; 
+}
+
+.preview-canvas-wrapper iframe { 
+    width: 100%; 
+    height: 100%; 
+    border: none; 
+    display: block; 
+    animation: paperSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 .preview-canvas-wrapper iframe { width: 100%; height: 100%; border: none; display: block; }
 
 /* TOASTS */
@@ -701,41 +738,44 @@ table.ui-table tbody tr:focus-within { background-color: rgba(0, 0, 0, 0.04); bo
     [data-theme="dark"] .autocomplete-dropdown { box-shadow: 0 16px 40px rgba(0,0,0,0.8); }
     .autocomplete-dropdown div { padding: 16px; font-size: 14px; }
 }
-/* ==========================================
-       HOẠT ẢNH: KÉO ĐỂ LÀM MỚI (PULL-TO-REFRESH)
-       ========================================== */
-    .ptr-spinner {
-        position: fixed;
-        top: 60px; /* Nằm ngay dưới thanh Nav */
-        left: 50%;
-        transform: translateX(-50%) translateY(-100px) rotate(0deg); /* Mặc định giấu tít lên trên */
-        width: 36px; height: 36px;
-        background: var(--bg-surface);
-        border-radius: 50%;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: flex; align-items: center; justify-content: center;
-        color: var(--text-main);
-        z-index: 800;
-        transition: transform 0s; /* Khi ngón tay đang vuốt thì bám sát ngón tay, không làm mượt */
-        opacity: 0;
-    }
-    [data-theme="dark"] .ptr-spinner { box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
-    
-    /* Trạng thái đang tải (Xoay tròn) */
-    .ptr-spinner.refreshing {
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Hiệu ứng nảy bóp hồi */
-        transform: translateX(-50%) translateY(24px) rotate(360deg) !important;
-        opacity: 1 !important;
-    }
-    .ptr-spinner.refreshing .spin-icon { animation: ptrSpin 1s linear infinite; }
-    
-    /* Trạng thái thu về (Ẩn đi) */
-    .ptr-spinner.resetting {
-        transition: transform 0.3s ease, opacity 0.3s ease;
-        transform: translateX(-50%) translateY(-100px) rotate(0deg) !important;
-        opacity: 0 !important;
-    }
-    @keyframes ptrSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+	/* ==========================================
+   HOẠT ẢNH: KÉO ĐỂ LÀM MỚI (PULL-TO-REFRESH)
+   ========================================== */
+.ptr-spinner {
+    position: fixed;
+    top: 24px; /* Đẩy lên sát mép trên cùng để đè lên Top Nav */
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px) rotate(0deg); 
+    width: 42px; height: 42px; /* Tăng kích thước một chút để ngón tay dễ cảm nhận */
+    background: var(--bg-surface);
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-main);
+    z-index: 9999; /* Nâng lên lớp cao nhất, nổi bần bật qua mọi thành phần */
+    transition: transform 0s; 
+    opacity: 0;
+    pointer-events: none; /* Tránh cản trở người dùng bấm vào các nút bên dưới */
+}
+[data-theme="dark"] .ptr-spinner { box-shadow: 0 4px 16px rgba(255,255,255,0.15); }
+
+/* Trạng thái đang tải (Xoay tròn) */
+.ptr-spinner.refreshing {
+    /* THÊM !important để giành lại quyền xử lý mượt mà từ JavaScript */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease !important; 
+    transform: translateX(-50%) translateY(50px) rotate(360deg) !important; /* Rơi xuống sâu hơn */
+    opacity: 1 !important;
+}
+.ptr-spinner.refreshing .spin-icon { animation: ptrSpin 1s linear infinite; }
+
+/* Trạng thái thu về (Ẩn đi) */
+.ptr-spinner.resetting {
+    /* THÊM !important để thu về mượt mà */
+    transition: transform 0.3s ease, opacity 0.3s ease !important;
+    transform: translateX(-50%) translateY(-100px) rotate(0deg) !important;
+    opacity: 0 !important;
+}
+@keyframes ptrSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 	/* ==========================================
        TỐI ƯU UX CHUYÊN SÂU: SLIDE PAGE, CONTEXT MENU, SWIPE TOAST
        ========================================== */
