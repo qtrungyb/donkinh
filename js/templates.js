@@ -135,39 +135,48 @@ export function generatePrintHtml(customData = null) {
     <style>
         @page { size: A5; margin: 10mm 10mm; } 
         body { font-family: 'Times New Roman', serif; font-size: 12.5pt; line-height: 1.32; color: #000; margin: 0; padding: 0; } 
-        @media screen { 
-            /* Hiển thị như một tờ giấy A5 thật trên nền xám (dành cho máy tính/màn hình to) */
+        
+        /* Hiển thị như một tờ giấy A5 thật trên nền xám (dành cho máy tính/màn hình to) */
         @media screen { 
             html, body { 
                 width: 100%; 
                 height: 100%; 
                 margin: 0; 
                 padding: 0; 
-                background: #e4e4e7; /* Nền xám bao quanh tờ giấy */
+                background: #e4e4e7; 
             } 
             body { 
-                width: 148mm; /* Cố định bề ngang khổ A5 */
-                min-height: 210mm; /* Cố định bề dọc khổ A5 */
-                margin: 10px auto; /* Căn giữa tờ giấy */
+                width: 148mm; 
+                min-height: 210mm; 
+                margin: 10px auto; 
                 background: white; 
                 padding: 10mm 10mm; 
                 box-sizing: border-box; 
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Đổ bóng cho giống tờ giấy thật */
-                transform-origin: top left; /* Làm gốc để thu nhỏ */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+                transform-origin: top left; 
             } 
         }
         
         /* Thuật toán CSS thu nhỏ trang giấy A5 vừa khít bề ngang điện thoại */
         @media screen and (max-width: 600px) {
             body {
-                transform: scale(0.65); /* Thu nhỏ tờ giấy còn 65% so với thực tế */
-                margin-bottom: -35%; /* Cắt bỏ phần khoảng trắng thừa bị dư ra dưới đáy sau khi thu nhỏ */
+                transform: scale(0.65); 
+                margin-bottom: -35%; 
             }
         }
+
+        /* KHUNG BẢNG VÀ CHỮ KÝ (Nằm ngoài @media để áp dụng cho cả lúc in và lúc xem) */
         table.print-table { width: 100%; border-collapse: collapse; margin: 10px 0; } 
-        table.print-table th, table.print-table td { border: 1px solid #000; padding: 5px; text-align: center; vertical-align: middle; } 
+        table.print-table th, table.print-table td { border: 1px solid #000 !important; padding: 5px; text-align: center; vertical-align: middle; } 
         .signature-box { text-align: center; width: 220px; } 
         .clearfix::after { content: ""; clear: both; display: table; }
+
+        /* Bắt buộc trình duyệt không được làm mờ viền bảng khi In (Tiết kiệm mực) */
+        @media print {
+            table.print-table th, table.print-table td { 
+                border: 1pt solid #000 !important; 
+            }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
