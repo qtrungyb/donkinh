@@ -388,8 +388,15 @@ function setupUIEventListeners() {
         isPulling = false;
         const pullDistance = currentY - startY;
 
+        // BẢN VÁ LỖI CỐT LÕI: Xóa sạch CSS nội tuyến (inline) do ngón tay vừa kéo tạo ra.
+        // Trả lại toàn quyền điều khiển hiệu ứng ẩn/hiện cho file style.css
+        ptrSpinner.style.transform = '';
+        ptrSpinner.style.opacity = '';
+        ptrSpinner.style.transition = '';
+
         // Nếu quãng đường vuốt xuống đủ dài (> 120px) -> Kích hoạt load dữ liệu
         if (pullDistance > 120 && window.scrollY === 0) {
+            ptrSpinner.classList.remove('resetting'); // Đảm bảo không dính class cũ
             ptrSpinner.classList.add('refreshing');
             
             // Chờ gọi dữ liệu từ Firebase
@@ -403,6 +410,7 @@ function setupUIEventListeners() {
             }, 600); 
         } else if (pullDistance > 0) {
             // Kéo nhẹ chưa đủ lực -> Bỏ qua, thu vòng tròn về
+            ptrSpinner.classList.remove('refreshing');
             ptrSpinner.classList.add('resetting');
         }
     });
