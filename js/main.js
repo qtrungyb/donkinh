@@ -887,6 +887,7 @@ function searchKinhDashboard() {
 // FORM LOGIC
 // ============================================================================
 function showFormView() {
+    window.scrollTo(0, 0); // Ép cuộn lên đỉnh màn hình ngay lập tức
     DOM.views.dashboard.classList.add('slide-out-left');
     DOM.views.form.style.display = 'block';
     DOM.views.form.classList.add('slide-in-right');
@@ -901,6 +902,7 @@ function showFormView() {
 }
 
 function showDashboardView() {
+    window.scrollTo(0, 0); // Ép cuộn lên đỉnh màn hình khi quay lại danh sách
     DOM.views.dashboard.style.display = 'block';
     DOM.views.dashboard.classList.add('slide-in-left');
     DOM.views.form.classList.add('slide-out-right');
@@ -933,7 +935,9 @@ function resetForm() {
     ['btnCancelEdit', 'btnPrint', 'btnExport', 'btnExportImg', 'btnEditAfterSave', 'btnDeleteAfterSave', 'btnBackToDashBottom'].forEach(id => document.getElementById(id).style.display = 'none');
     toggleFormLock(false); 
     checkDraftStatus();
-    setTimeout(() => { DOM.form.hoTen.focus(); }, 100);
+    
+    // SỬA DÒNG NÀY: Đợi hiệu ứng trượt trang (350ms) kết thúc rồi mới focus để tránh giật lag
+    setTimeout(() => { DOM.form.hoTen.focus(); }, 360);
 }
 
 function toggleKinh2(show) {
