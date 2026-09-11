@@ -182,17 +182,18 @@ export function generatePrintHtml(customData = null) {
 </head>
 <body>
     
-    <div style="position: relative; margin-bottom: 16px;">
-        <div style="color: #777; font-size: 11pt;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+        <div style="color: #777; font-size: 11pt; padding-top: 5px;">
             <div style="font-weight: bold;">BỆNH VIỆN ĐA KHOA TRƯỜNG ĐỨC</div>
             <div style="font-weight: bold;">Phòng khám Mắt</div>
         </div>
         
-        <div style="position: absolute; top: 0; right: 0;">
-			<canvas id="qrcode" style="width: 110px; height: 110px; display: block;" title="Mã quét thông số cắt kính"></canvas>
-		</div>
-
-        <h2 style="margin: 10px 0 0 0; text-transform: uppercase; font-size: 17pt; text-align: center;">ĐƠN KÍNH</h2>
+        <div>
+            <canvas id="qrcode" style="width: 145px; height: 145px; display: block;" title="Mã quét thông số cắt kính"></canvas>
+        </div>
+    </div>
+    
+    <h2 style="margin: 0 0 16px 0; text-transform: uppercase; font-size: 17pt; text-align: center;">ĐƠN KÍNH</h2>
     </div>
 
     <div style="margin-bottom: 6px;">Họ và tên: <b>${getVal('hoTen')}</b> &nbsp;&nbsp;&nbsp; Tuổi: ${getVal('tuoi')} &nbsp;&nbsp;&nbsp; Giới: ${getVal('gioi')}</div>
@@ -235,17 +236,17 @@ export function generatePrintHtml(customData = null) {
     </div>
     
     <script>
-		window.onload = function() {
-			try {
-				new QRious({
-					element: document.getElementById("qrcode"),
-					value: "${safeQrData}",
-					size: 450,
-					level: "M" 
-				});
-			} catch(e) { console.error("Lỗi vẽ QR Code:", e); }
-		};
-	</script>
+        window.onload = function() {
+            try {
+                new QRious({
+                    element: document.getElementById("qrcode"),
+                    value: "${safeQrData}",
+                    size: 500,
+                    level: "M" 
+                });
+            } catch(e) { console.error("Lỗi vẽ QR Code:", e); }
+        };
+    </script>
 </body>
 </html>`;
 }
