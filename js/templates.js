@@ -189,8 +189,8 @@ export function generatePrintHtml(customData = null) {
         </div>
         
         <div style="position: absolute; top: 0; right: 0;">
-            <canvas id="qrcode" style="width: 75px; height: 75px; display: block;" title="Mã quét thông số cắt kính"></canvas>
-        </div>
+			<canvas id="qrcode" style="width: 110px; height: 110px; display: block;" title="Mã quét thông số cắt kính"></canvas>
+		</div>
 
         <h2 style="margin: 10px 0 0 0; text-transform: uppercase; font-size: 17pt; text-align: center;">ĐƠN KÍNH</h2>
     </div>
@@ -235,17 +235,17 @@ export function generatePrintHtml(customData = null) {
     </div>
     
     <script>
-        window.onload = function() {
-            try {
-                new QRious({
-                    element: document.getElementById("qrcode"),
-                    value: "${safeQrData}",
-                    size: 250,
-                    level: "M" 
-                });
-            } catch(e) { console.error("Lỗi vẽ QR Code:", e); }
-        };
-    </script>
+		window.onload = function() {
+			try {
+				new QRious({
+					element: document.getElementById("qrcode"),
+					value: "${safeQrData}",
+					size: 450,
+					level: "M" 
+				});
+			} catch(e) { console.error("Lỗi vẽ QR Code:", e); }
+		};
+	</script>
 </body>
 </html>`;
 }
