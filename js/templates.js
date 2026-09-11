@@ -189,7 +189,7 @@ export function generatePrintHtml(customData = null) {
         </div>
         
         <div style="position: absolute; top: 0; right: 0;">
-            <canvas id="qrcode" style="width: 90px; height: 90px; display: block;" title="Mã quét thông số cắt kính"></canvas>
+            <canvas id="qrcode" style="width: 75px; height: 75px; display: block;" title="QR thông số kính"></canvas>
         </div>
 
         <h2 style="margin: 10px 0 0 0; text-transform: uppercase; font-size: 17pt; text-align: center;">ĐƠN KÍNH</h2>
