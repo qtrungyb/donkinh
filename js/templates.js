@@ -179,6 +179,8 @@ export function generatePrintHtml(customData = null) {
             max-height: 90px !important;
             object-fit: contain;
             display: block;
+            border-radius: 10px !important; /* Bo tròn các góc của mã QR */
+            overflow: hidden !important; /* Cắt bỏ phần góc nhọn bị thừa */
         }
 
         /* Bắt buộc trình duyệt không được làm mờ viền bảng khi In (Tiết kiệm mực) */
