@@ -1320,7 +1320,7 @@ function openDetailModal(index) {
         const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(dataObj)))));
         const safeQrData = `https://donkinh-eea6b.web.app/don-kinh.html?data=${encodedData}`;
         
-        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 250, level: "M" });
+        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 1500, padding: 0, level: "M" });
     }
     DOM.modal.iframe.srcdoc = generatePrintHtml(data);
     DOM.modal.name.innerText = item.hoTen;

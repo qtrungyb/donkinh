@@ -171,6 +171,16 @@ export function generatePrintHtml(customData = null) {
         .signature-box { text-align: center; width: 220px; } 
         .clearfix::after { content: ""; clear: both; display: table; }
 
+        /* Ép cứng kích thước mã QR, chống bị thư viện tự thay đổi theo lượng dữ liệu */
+        #qrcode {
+            width: 90px !important;
+            height: 90px !important;
+            max-width: 90px !important;
+            max-height: 90px !important;
+            object-fit: contain;
+            display: block;
+        }
+
         /* Bắt buộc trình duyệt không được làm mờ viền bảng khi In (Tiết kiệm mực) */
         @media print {
             table.print-table th, table.print-table td { 
@@ -188,7 +198,7 @@ export function generatePrintHtml(customData = null) {
             <div style="font-weight: bold;">Phòng khám Mắt</div>
         </div>
         
-        <div style="position: absolute; top: 0; right: 0; width: 90px; height: 90px; max-width: 90px; max-height: 90px;">
+        <div style="position: absolute; top: 0; right: 0; width: 90px; height: 90px;">
             <canvas id="qrcode" style="width: 100% !important; height: 100% !important; display: block;" title="QR thông số kính"></canvas>
         </div>
 
@@ -240,7 +250,8 @@ export function generatePrintHtml(customData = null) {
                 new QRious({
                     element: document.getElementById("qrcode"),
                     value: "${safeQrData}",
-                    size: 250,
+                    size: 2500, /* KÍCH THƯỚC KHỔNG LỒ TRIỆT TIÊU VIỀN TRẮNG */
+                    padding: 0,
                     level: "M" 
                 });
             } catch(e) { console.error("Lỗi vẽ QR Code:", e); }
