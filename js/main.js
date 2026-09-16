@@ -1331,7 +1331,7 @@ function openDetailModal(index) {
         DOM.modal.qrCode.style.backgroundColor = "#ffffff";
         DOM.modal.qrCode.style.boxSizing = "border-box";
 
-        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 300, padding: 0, level: "L" });
+        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 1500, padding: 0, level: "L" });
     }
     DOM.modal.iframe.srcdoc = generatePrintHtml(data);
     DOM.modal.name.innerText = item.hoTen;

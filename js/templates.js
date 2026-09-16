@@ -174,8 +174,8 @@ export function generatePrintHtml(customData = null) {
             position: absolute;
             top: 0;
             right: 0;
-            width: 90px;
-            height: 90px;
+            width: 95px;
+            height: 95px;
             background: #ffffff;
             padding: 4px; /* Viền trắng CSS giúp tách biệt QR khỏi văn bản */
             box-sizing: border-box;
@@ -263,7 +263,7 @@ export function generatePrintHtml(customData = null) {
                 new QRious({
                     element: document.getElementById("qrcode"),
                     value: "${safeQrData}",
-                    size: 300, 
+                    size: 1500, 
                     padding: 0, /* TẮT PADDING TRONG THƯ VIỆN, ĐỂ LÕI QR BUNG TO KỊCH KIM 100% DIỆN TÍCH */
                     level: "L" 
                 });
