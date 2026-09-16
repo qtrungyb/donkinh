@@ -1316,11 +1316,22 @@ function openDetailModal(index) {
             tl_mp: String(data.mp_gc || "---").trim(), tl_mt: String(data.mt_gc || "---").trim()
         };
         
+        // NÉN DỮ LIỆU ĐỂ LƯỚI QR THƯA VÀ DỄ QUÉT HƠN
+        Object.keys(dataObj).forEach(key => {
+            if (!dataObj[key] || dataObj[key] === "---" || dataObj[key] === "--" || dataObj[key] === "0.00") {
+                delete dataObj[key];
+            }
+        });
+
         const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(dataObj)))));
         const safeQrData = `https://donkinh-eea6b.web.app/don-kinh.html?data=${encodedData}`;
         
-        // Tối ưu cho size nhỏ: padding 15 tạo viền trắng an toàn, level L giúp lưới thưa ra
-        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 500, padding: 15, level: "L" });
+        // Tạo viền trắng bằng CSS tĩnh, để padding của thư viện = 0 giúp lõi QR to nhất có thể
+        DOM.modal.qrCode.style.padding = "4px";
+        DOM.modal.qrCode.style.backgroundColor = "#ffffff";
+        DOM.modal.qrCode.style.boxSizing = "border-box";
+
+        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 300, padding: 0, level: "L" });
     }
     DOM.modal.iframe.srcdoc = generatePrintHtml(data);
     DOM.modal.name.innerText = item.hoTen;
