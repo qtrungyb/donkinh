@@ -171,7 +171,7 @@ export function generatePrintHtml(customData = null) {
         .signature-box { text-align: center; width: 220px; } 
         .clearfix::after { content: ""; clear: both; display: table; }
 
-        /* Ép cứng kích thước mã QR, chống bị thư viện tự thay đổi theo lượng dữ liệu */
+        /* Kích thước 90x90px, tắt làm mờ pixel, không bo góc */
         #qrcode {
             width: 90px !important;
             height: 90px !important;
@@ -179,8 +179,10 @@ export function generatePrintHtml(customData = null) {
             max-height: 90px !important;
             object-fit: contain;
             display: block;
-            border-radius: 10px !important; /* Bo tròn các góc của mã QR */
-            overflow: hidden !important; /* Cắt bỏ phần góc nhọn bị thừa */
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated; 
         }
 
         /* Bắt buộc trình duyệt không được làm mờ viền bảng khi In (Tiết kiệm mực) */
@@ -252,9 +254,9 @@ export function generatePrintHtml(customData = null) {
                 new QRious({
                     element: document.getElementById("qrcode"),
                     value: "${safeQrData}",
-                    size: 2500, /* KÍCH THƯỚC KHỔNG LỒ TRIỆT TIÊU VIỀN TRẮNG */
-                    padding: 0,
-                    level: "M" 
+                    size: 500, /* Giữ size nội bộ to để nét căng khi in */
+                    padding: 15, /* Vùng đệm trắng vừa đủ mỏng để không làm lõi QR bị teo đi */
+                    level: "L" 
                 });
             } catch(e) { console.error("Lỗi vẽ QR Code:", e); }
         };

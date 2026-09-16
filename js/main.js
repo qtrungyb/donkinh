@@ -1316,11 +1316,11 @@ function openDetailModal(index) {
             tl_mp: String(data.mp_gc || "---").trim(), tl_mt: String(data.mt_gc || "---").trim()
         };
         
-        // Mã hóa dữ liệu và truyền vào thẻ Canvas bằng thư viện QRious
         const encodedData = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(dataObj)))));
         const safeQrData = `https://donkinh-eea6b.web.app/don-kinh.html?data=${encodedData}`;
         
-        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 1500, padding: 0, level: "M" });
+        // Tối ưu cho size nhỏ: padding 15 tạo viền trắng an toàn, level L giúp lưới thưa ra
+        new QRious({ element: DOM.modal.qrCode, value: safeQrData, size: 500, padding: 15, level: "L" });
     }
     DOM.modal.iframe.srcdoc = generatePrintHtml(data);
     DOM.modal.name.innerText = item.hoTen;
