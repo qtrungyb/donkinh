@@ -764,7 +764,7 @@ async function loadDashboardData() {
     } catch (e) { console.warn("Chưa có cache cục bộ."); }
 
     try {
-        const results = await fetchDonKinhList(300); // Giới hạn 300 bản ghi mới nhất chống treo
+        const results = await fetchDonKinhList(1000); // Giới hạn 300 bản ghi mới nhất chống treo
         AppState.dashboardAllData = results;
         const newDataString = JSON.stringify(results);
         
